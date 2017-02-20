@@ -1,11 +1,15 @@
 var win;
 
-// define place of fixed clusters.name: 1,
+// define fixed clusters - make dynamic laterz
 var clusters = [
 	{name: 1, xx:150, yy:280},
 	{name: 1, xx:360, yy:120},
 	{name: 1, xx:570, yy:280}
 	]
+
+// we will need real words later, but now we just click a few ==> random_dot()
+var words = []
+
 
 function draw(data) {
 	"use strict"
@@ -20,8 +24,7 @@ function draw(data) {
 		width: container_dimensions.width - margins.left - margins.right,
 		height: container_dimensions.height - margins.top - margins.bottom};
 
-
-
+	// main svg container
 	var chart_disp = d3.select("#chart_disp")//.style("border", "dashed black")
 		.append("svg")
 			.attr("width", container_dimensions.width)
@@ -90,8 +93,28 @@ function draw(data) {
 		console.log(win)
 		});
 
+
+	// create random datapoints by clicking
+	function random_dot(x, y, r) {
+        chart_disp.append("circle")
+            .attr("class", "random_dot")
+            .attr("cluster", Math.ceil(Math.random() * (clusters.length)) ) // assign to cluster
+            .attr("cx", x)
+            .attr("cy", y)
+            .attr("r", r)
+	}
+	chart_disp.on("click", function(){
+		var mpos = d3.mouse(this);
+		random_dot(mpos[0],mpos[1],5);
+	});
+
+
 }; // end of draw
 
+// TODO
+	// create fake word data, by clicks for now. later we invent json data. - done for now.
+	// make word object find their clusters (mbostock collide funtion! <3)
+	// 
 
 
 
