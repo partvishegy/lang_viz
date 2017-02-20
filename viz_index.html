@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="lang_viz.css">
+		<script src="d3/d3.js"></script>
+		<script type="text/javascript" src="lang_viz.js"></script> <!-- this is the draw function. -->
+	</head>
+	<body>
+		<div id="chart_disp"></div>
+		<!-- <div id="hist_disp"></div> -->
+		<div id="control">
+			<div class="button" id="back">back</div>
+			<div class="button" id="forth">forth</div>
+		</div>
+
+
+		<script>
+			d3.json("./data/fake_clusters_01.json", draw); 
+		</script>
+	</body>
+</html>
