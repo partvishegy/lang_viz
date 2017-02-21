@@ -12,18 +12,30 @@ var clusters = [
 
 // we will need real words later, but now we just click a few ==> random_dot()
 var words = [
-	{"name" : "V1", "x"	: 100, "y"	: 200, "cluster": 1, "r":5},
-	{"name" : "V2", "x"	: 200, "y"	: 200, "cluster": 2, "r":5},
-	{"name" : "V3", "x"	: 100, "y"	: 100, "cluster": 3, "r":5},
-/*	{"name" : "V4", "x"	: 150, "y"	: 250, "cluster": 1, "r":5},
-	{"name" : "V5", "x"	: 200, "y"	: 200, "cluster": 2, "r":5},
-	{"name" : "V6", "x"	: 100, "y"	: 100, "cluster": 3, "r":5},
-	{"name" : "V7", "x"	: 150, "y"	: 250, "cluster": 1, "r":5},
-	{"name" : "V8", "x"	: 200, "y"	: 200, "cluster": 2, "r":5},
-	{"name" : "V9", "x"	: 100, "y"	: 100, "cluster": 3, "r":5},
-	{"name" : "V10","x" : 150, "y"	: 250, "cluster": 1, "r":5},*/
-	{"name" : "V11","x" : 200, "y"	: 100, "cluster": 2, "r":5}
+	{"name" : "V1", "x"	: 100, "y"	: 201, "cluster": 1, "r":5},
+	{"name" : "V2", "x"	: 200, "y"	: 202, "cluster": 2, "r":5},
+	{"name" : "V3", "x"	: 100, "y"	: 103, "cluster": 3, "r":5},
+	{"name" : "V4", "x"	: 151, "y"	: 254, "cluster": 1, "r":5},
+	{"name" : "V5", "x"	: 202, "y"	: 203, "cluster": 2, "r":5},
+	{"name" : "V6", "x"	: 103, "y"	: 102, "cluster": 3, "r":5},
+	{"name" : "V7", "x"	: 154, "y"	: 257, "cluster": 1, "r":5},
+	{"name" : "V8", "x"	: 205, "y"	: 206, "cluster": 2, "r":5},
+	{"name" : "V9", "x"	: 106, "y"	: 112, "cluster": 3, "r":5},
+	{"name" : "V10","x" : 154, "y"	: 259, "cluster": 1, "r":5},
+	{"name" : "V11","x"	: 206, "y"	: 203, "cluster": 2, "r":5},
+	{"name" : "V12","x"	: 108, "y"	: 102, "cluster": 3, "r":5},
+	{"name" : "V13","x"	: 164, "y"	: 257, "cluster": 1, "r":5},
+	{"name" : "V14","x"	: 217, "y"	: 206, "cluster": 2, "r":5},
+	{"name" : "V15","x"	: 126, "y"	: 112, "cluster": 3, "r":5},
+	{"name" : "V16","x" : 234, "y"	: 101, "cluster": 2, "r":5}
 	]
+
+// add (random) color to words!
+words.map(function(d){
+	console.log(d)
+	var h = Math.ceil(Math.random() * 360)
+	d.color = "hsla("+h.toString()+", 100%, 20%, 0.5)"	
+})
 
 var word_count = 0
 
@@ -69,7 +81,7 @@ function draw(data) {
 			.attr("class", "cluster")
 			.attr("cx", function(d){return d.xx})
 			.attr("cy", function(d){return d.yy})
-			.attr("r", 80)
+			.attr("r", 40)
 
 	// navigational buttons
 	d3.select("#forth")
@@ -114,6 +126,7 @@ function draw(data) {
             .attr("cy", function(d){return d.y})
 			.attr("r", 5) // az x és y koordináták elvieg a layout.force-ból jönnek!
 			.attr("id", function(d){return d.name})
+			.attr("fill", function(d){return d.color})
 			/*.style("fill", function(d) { return d.color; });*/
 			.call(force.drag);
 
@@ -134,7 +147,7 @@ function draw(data) {
 			var damper = 1;
 		}
 		o.color = color(curr_act);*/
-			console.log([o.x, o.y])
+			//console.log([o.x, o.y])
 			o.y += (clusters[o.cluster-1].yy - o.y) * k; // itt updateli a focinak megfelelően!
 			o.x += (clusters[o.cluster-1].xx - o.x) * k;	// akkor nem tudom mi történik a timerben cx-szel, de mindegy is.
 		});
@@ -196,8 +209,8 @@ function draw(data) {
 
 	// multiple words take the same place, debug! - done
 
-	// add more dots
-	// add random colors, for fun
+	// add more word_dots 		   - done. for now
+	// add random colors, for fun  - done
 	
 	// add more complex word objects
 		// create chedules for them
