@@ -14,22 +14,27 @@ var clusters = [
 var words = [
 	{"name" : "w1", "x"	: 100, "y"	: 201, "cluster": 1, "r":5, "sched":[1,1,2,0]},
 	{"name" : "w2", "x"	: 200, "y"	: 202, "cluster": 2, "r":5, "sched":[2,0,1,2]},
-/*	{"name" : "w3", "x"	: 100, "y"	: 103, "cluster": 3, "r":5},
-	{"name" : "w4", "x"	: 151, "y"	: 254, "cluster": 1, "r":5},
-	{"name" : "w5", "x"	: 202, "y"	: 203, "cluster": 2, "r":5},
-	{"name" : "w6", "x"	: 103, "y"	: 102, "cluster": 3, "r":5},
-	{"name" : "w7", "x"	: 154, "y"	: 257, "cluster": 1, "r":5},
-	{"name" : "w8", "x"	: 205, "y"	: 206, "cluster": 2, "r":5},
-	{"name" : "w9", "x"	: 106, "y"	: 112, "cluster": 3, "r":5},
-	{"name" : "w10","x" : 154, "y"	: 259, "cluster": 1, "r":5},
-	{"name" : "w11","x"	: 206, "y"	: 203, "cluster": 2, "r":5},
-	{"name" : "w12","x"	: 108, "y"	: 102, "cluster": 3, "r":5},
-	{"name" : "w13","x"	: 164, "y"	: 257, "cluster": 1, "r":5},
-	{"name" : "w14","x"	: 217, "y"	: 206, "cluster": 2, "r":5},
-	{"name" : "w15","x"	: 126, "y"	: 112, "cluster": 3, "r":5},*/
-	{"name" : "w16","x" : 234, "y"	: 101, "cluster": 2, "r":5, "sched":[2,1,0,1]}
+	{"name" : "w3", "x" : 234, "y"	: 101, "cluster": 2, "r":5, "sched":[2,1,0,1]}
 	]
-// now init "cluster" and sched[0] is rednundant! but its ok.
+
+// generate more fake words, for testing
+d3.range(30).map(function(i){
+	words.push(
+		{"name":"w".concat(i+3),
+		  "x": Math.ceil(Math.random()*400),
+		  "y": Math.ceil(Math.random()*300),
+		  "cluster": Math.ceil(Math.random()*clusters.length-1),
+		  "r": 5,
+		  "sched": Array.apply(null, {length: 4}).map(Function.call, // updeate length with last_win
+		   function(){return Math.ceil(Math.random()*clusters.length-1)})
+
+		})
+	});
+
+
+
+
+// now init "cluster" and sched[0] hold the same value, but one is for current pos, one is for memory!
 
 // alternative way if the full list does not prove to be practical:
 // "sched":[{"next_move":2, "dest_clust":0},{"next_move":3, "dest_clust":2}]
@@ -167,15 +172,9 @@ function draw(data) {
 
 		// Push nodes toward their designated focus.
 		words.forEach(function(o, i) {
-/*		var curr_act = o.act;
 
-		// Make sleep more sluggish moving.
-		if (curr_act == "0") {
-			var damper = 0.6;
-		} else {
-			var damper = 1;
-		}
-		o.color = color(curr_act);*/
+
+			//o.color = color(curr_act);
 			//console.log([o.x, o.y])
 			o.y += (clusters[o.cluster].yy - o.y) * k; // itt updateli a focinak megfelelően!
 			o.x += (clusters[o.cluster].xx - o.x) * k;	// akkor nem tudom mi történik a timerben cx-szel, de mindegy is.
