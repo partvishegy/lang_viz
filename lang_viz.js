@@ -3,38 +3,46 @@ var win;
 var padding = 3,	// think about these plz.
 	maxRadius = 3;
 
-// define fixed clusters - make dynamic laterz
+// define fixed clusters - make dynamic later
 var clusters = [
-	{name: 1, xx:150, yy:280},
-	{name: 2, xx:360, yy:120},
-	{name: 3, xx:570, yy:280}
+	{name: 0, xx:150, yy:280},
+	{name: 1, xx:360, yy:120},
+	{name: 2, xx:570, yy:280}
 	]
 
-// we will need real words later, but now we just click a few ==> random_dot()
+// sample word data
 var words = [
-	{"name" : "V1", "x"	: 100, "y"	: 201, "cluster": 1, "r":5},
-	{"name" : "V2", "x"	: 200, "y"	: 202, "cluster": 2, "r":5},
-	{"name" : "V3", "x"	: 100, "y"	: 103, "cluster": 3, "r":5},
-	{"name" : "V4", "x"	: 151, "y"	: 254, "cluster": 1, "r":5},
-	{"name" : "V5", "x"	: 202, "y"	: 203, "cluster": 2, "r":5},
-	{"name" : "V6", "x"	: 103, "y"	: 102, "cluster": 3, "r":5},
-	{"name" : "V7", "x"	: 154, "y"	: 257, "cluster": 1, "r":5},
-	{"name" : "V8", "x"	: 205, "y"	: 206, "cluster": 2, "r":5},
-	{"name" : "V9", "x"	: 106, "y"	: 112, "cluster": 3, "r":5},
-	{"name" : "V10","x" : 154, "y"	: 259, "cluster": 1, "r":5},
-	{"name" : "V11","x"	: 206, "y"	: 203, "cluster": 2, "r":5},
-	{"name" : "V12","x"	: 108, "y"	: 102, "cluster": 3, "r":5},
-	{"name" : "V13","x"	: 164, "y"	: 257, "cluster": 1, "r":5},
-	{"name" : "V14","x"	: 217, "y"	: 206, "cluster": 2, "r":5},
-	{"name" : "V15","x"	: 126, "y"	: 112, "cluster": 3, "r":5},
-	{"name" : "V16","x" : 234, "y"	: 101, "cluster": 2, "r":5}
+	{"name" : "w1", "x"	: 100, "y"	: 201, "cluster": 1, "r":5, "sched":[1,1,2,0]},
+	{"name" : "w2", "x"	: 200, "y"	: 202, "cluster": 2, "r":5, "sched":[2,0,1,2]},
+/*	{"name" : "w3", "x"	: 100, "y"	: 103, "cluster": 3, "r":5},
+	{"name" : "w4", "x"	: 151, "y"	: 254, "cluster": 1, "r":5},
+	{"name" : "w5", "x"	: 202, "y"	: 203, "cluster": 2, "r":5},
+	{"name" : "w6", "x"	: 103, "y"	: 102, "cluster": 3, "r":5},
+	{"name" : "w7", "x"	: 154, "y"	: 257, "cluster": 1, "r":5},
+	{"name" : "w8", "x"	: 205, "y"	: 206, "cluster": 2, "r":5},
+	{"name" : "w9", "x"	: 106, "y"	: 112, "cluster": 3, "r":5},
+	{"name" : "w10","x" : 154, "y"	: 259, "cluster": 1, "r":5},
+	{"name" : "w11","x"	: 206, "y"	: 203, "cluster": 2, "r":5},
+	{"name" : "w12","x"	: 108, "y"	: 102, "cluster": 3, "r":5},
+	{"name" : "w13","x"	: 164, "y"	: 257, "cluster": 1, "r":5},
+	{"name" : "w14","x"	: 217, "y"	: 206, "cluster": 2, "r":5},
+	{"name" : "w15","x"	: 126, "y"	: 112, "cluster": 3, "r":5},*/
+	{"name" : "w16","x" : 234, "y"	: 101, "cluster": 2, "r":5, "sched":[2,1,0,1]}
 	]
+// now init "cluster" and sched[0] is rednundant! but its ok.
 
-// add (random) color to words!
+// alternative way if the full list does not prove to be practical:
+// "sched":[{"next_move":2, "dest_clust":0},{"next_move":3, "dest_clust":2}]
+
+// calculate additional values for words and clusters based on their attribs
+
+// add (random) color to words! add pos = 0. why would i write it in the data?
 words.map(function(d){
 	console.log(d)
 	var h = Math.ceil(Math.random() * 360)
-	d.color = "hsla("+h.toString()+", 100%, 20%, 0.5)"	
+	d.color = "hsla("+h.toString()+", 100%, 20%, 0.5)";
+	//d.sch_pos = 0; // schedule position. - wont be needed if we implement fullist.
+
 })
 
 var word_count = 0
@@ -45,7 +53,8 @@ function draw(data) {
 	console.log("running!")
 	console.log(data)//.xx.length
 
-	var last_win = data[data.length-1].birth + data[data.length-1].xx.length -1
+	var last_win = words[0].sched.length-1
+	// data[data.length-1].birth + data[data.length-1].xx.length -1
 
 	var container_dimensions = {width: 900, height: 400}
 
@@ -73,6 +82,24 @@ function draw(data) {
 									  // ezt majd átkonverálhatjuk heat palettára
 	}*/
 
+	function update_words(){
+		// check who is alive: call death and birth functions.
+		// basszus. hogy tároljam? csak születési ablakokat és halál ablakokat? vagy legyen fullos ablakonkénti lista, és simple lookup?
+		// akkor már tartahtnám ott a clustereket, és ha -1, akkor épp halott.
+		// ----------------------
+		d3.range(words.length).map(function(i){
+			//w = words[i]
+			console.log(words[i].name)
+
+			words[i].cluster = words[i].sched[win]
+			force.resume()
+
+		});
+
+
+
+
+	}
 
 	chart_disp.selectAll("circle.cluster")
 		.data(clusters)
@@ -90,6 +117,7 @@ function draw(data) {
 				win+=1
 			}
 		update_frame()
+		update_words()
 		
 		console.log(win)
 		});
@@ -100,6 +128,7 @@ function draw(data) {
 				win-=1
 			}
 		update_frame()
+		update_words()
 
 		console.log(win)
 		});
@@ -148,8 +177,8 @@ function draw(data) {
 		}
 		o.color = color(curr_act);*/
 			//console.log([o.x, o.y])
-			o.y += (clusters[o.cluster-1].yy - o.y) * k; // itt updateli a focinak megfelelően!
-			o.x += (clusters[o.cluster-1].xx - o.x) * k;	// akkor nem tudom mi történik a timerben cx-szel, de mindegy is.
+			o.y += (clusters[o.cluster].yy - o.y) * k; // itt updateli a focinak megfelelően!
+			o.x += (clusters[o.cluster].xx - o.x) * k;	// akkor nem tudom mi történik a timerben cx-szel, de mindegy is.
 		});
 
 		// ok, e.alpha folyamatosan csökken, minden tick-nél.
@@ -195,10 +224,6 @@ function draw(data) {
 }; // end of draw
 
 
-// force.resume()  lehet, hogy ez hiányzik?	
-// nincs saját radius attribútuma a word_dot objecteknek! ezért nem tartja a távot a collide!
-
-
 
 // TODO
 	// create fake word data, by clicks for now. later we invent json data. - done for now.
@@ -211,19 +236,39 @@ function draw(data) {
 
 	// add more word_dots 		   - done. for now
 	// add random colors, for fun  - done
+	// ----------------------------------
 	
 	// add more complex word objects
 		// create chedules for them
-		// make update function
+		// make update function connect buttons
+			// ellenőrizni kell, hogy ki él és ki nem,
+				// aki meghalt, annak kell egy death_transit function
+				// aki születik, akkak meg egy birth_stransit.
 
-		// there might be some flow problems with word birth and death
-	
+// there might be some flow problems with word birth and death
+// bizony, és nem is tudok vele haladni, amíg nem beszélünk róla egy kicsit. flow.
+// 600.000+ szó, az lehet, hogy para, de akkor hogy lesz kisebb az adat?
 
 
 
+// later but super important!
+	// lehessen gombbal és autoplay-jel is haladni az időben
+	// legyen érthető, szép idősáv, amin követhető, hogy hol tartunk
+	// legyenek meg az időben széthúzott hisztogrammok (milyen jellemzők?)
+	// lehessen kiválasztani egyes szavakat
+		// pulzáljon szépen (elhaló koncentrikus körök vagy ilyesmi) 
+			//(lehessen közben kijelölni újakat követésre, kattintással, és oldalt legyen nekik hely, ahol összefolalja az infókat róla!)
+			// esetleg legyen egy path/history function, ami behúz egy vonalat akorbban látogatott clusterek között!
+		// az lenne valószínűleg ideális, ha csak azok a clusterek jelennének meg, amikben valaha előfordul
+		// a kiválasztott szavak valamelyike
 
 
 
+// ---------------------------------------------
+//a cluster birth és death nagyon egyszerű lesz:
+	// birthnél new focus is created
+	// deathnél először a szavak megkapják az új helyüket, aztán a halott focit kivesszük.
+		// ilyenkor majd újrarendezzük a maradék focit. (az még kérdés, hogy mennyire lesz dinamikus a helyük, de aszerint)
 
 
 
