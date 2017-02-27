@@ -14,11 +14,11 @@ var clusters = [
 var words = [
 	{"name" : "w1", "x"	: 100, "y"	: 201, "cluster": 1, "r":5, "sched":[1,1,2,0]},
 	{"name" : "w2", "x"	: 200, "y"	: 202, "cluster": 2, "r":5, "sched":[2,0,1,2]},
-	{"name" : "w3", "x" : 234, "y"	: 101, "cluster": 2, "r":5, "sched":[2,1,0,1]}
+	{"name" : "w7", "x" : 234, "y"	: 101, "cluster": -1, "r":10, "sched":[-1,-1,0,1]}
 	]
 
 // generate more fake words, for testing
-d3.range(30).map(function(i){
+d3.range(1).map(function(i){
 	words.push(
 		{"name":"w".concat(i+3),
 		  "x": Math.ceil(Math.random()*400),
@@ -31,7 +31,9 @@ d3.range(30).map(function(i){
 		})
 	});
 
-
+var words_alive = []
+var words_dead  = []
+var word_dots;
 
 
 // now init "cluster" and sched[0] hold the same value, but one is for current pos, one is for memory!
@@ -50,7 +52,7 @@ words.map(function(d){
 
 })
 
-var word_count = 0
+var word_count = words_alive.legth // update in update birth and death.
 
 
 function draw(data) {
@@ -61,50 +63,52 @@ function draw(data) {
 	var last_win = words[0].sched.length-1
 	// data[data.length-1].birth + data[data.length-1].xx.length -1
 
-	var container_dimensions = {width: 900, height: 400}
+	var dimensions = {width: 750, height: 400}
 
 	// main svg container
 	var chart_disp = d3.select("#chart_disp")//.style("border", "dashed black")
 		.append("svg")
-			.attr("width", container_dimensions.width)
-			.attr("height", container_dimensions.height);
+			.attr("width", dimensions.width)
+			.attr("height", dimensions.height);
 
 
 	win = 0; /*update window value with back and forth buttons!*/
 	console.log(win)
 
 
-	function update_frame(){
-		console.log("frame updated!")
-	}
-/*		chart_disp.selectAll("circle")
-		.transition()
-			.attr("cx", function(d){return d.xx[win]})
-			.attr("cy", function(d){return d.yy[win]})
-			.attr("r", function(d){return d.fake1[win]*20})
-			.attr("fill", function(d){var h = d.fake2[win]*360;
-									  return "hsla("+h.toString()+", 100%, 20%, 0.5)"}); 
-									  // ezt majd átkonverálhatjuk heat palettára
-	}*/
+	// sort words to alive and dead lists
+	words.forEach(function(w){
+		//console.log(w)
+		if (w.cluster === -1){
+			words_dead.push(w)
+		}else{
+			words_alive.push(w)
+		}
+	});
+
 
 	function update_words(){
 		// check who is alive: call death and birth functions.
-		// basszus. hogy tároljam? csak születési ablakokat és halál ablakokat? vagy legyen fullos ablakonkénti lista, és simple lookup?
-		// akkor már tartahtnám ott a clustereket, és ha -1, akkor épp halott.
 		// ----------------------
 		d3.range(words.length).map(function(i){
 			//w = words[i]
-			console.log(words[i].name)
+			// console.log(words[i].name)
 
-			words[i].cluster = words[i].sched[win]
+			var last_clust = words[i].cluster
+
+			words[i].cluster = words[i].sched[win] // ezt majd az alive-ban akarjuk frissíteni! illetve mindegy.
+			
+			if (last_clust === -1 && words[i].cluster !== -1){
+				birth(words[i])
+			}
+			if (last_clust !== -1 && words[i].cluster === -1){
+				death(words[i])
+			}
+
 			force.resume()
-
 		});
-
-
-
-
 	}
+
 
 	chart_disp.selectAll("circle.cluster")
 		.data(clusters)
@@ -121,7 +125,6 @@ function draw(data) {
 			if (win!=last_win){
 				win+=1
 			}
-		update_frame()
 		update_words()
 		
 		console.log(win)
@@ -132,18 +135,15 @@ function draw(data) {
 			if (win!=0){
 				win-=1
 			}
-		update_frame()
 		update_words()
 
 		console.log(win)
 		});
 
 
-
-
 	var force = d3.layout.force()
-		.nodes(words)
-		.size([container_dimensions.width, container_dimensions.height])
+		.nodes(words_alive)
+		.size([dimensions.width, dimensions.height])
 		// .links([])
 		.gravity(0)
 		.charge(0) // ezt még haszon lehet
@@ -151,49 +151,83 @@ function draw(data) {
 		.on("tick", tick)
 		.start();
 
-	var word_dots = chart_disp.selectAll("circle.word")
-		.data(words)
+	word_dots = chart_disp.selectAll("circle.word")
+		.data(words_alive)
 	  	.enter()
 	  	.append("circle")
 		  	.attr("class","word")
             .attr("cx", function(d){return d.x})
             .attr("cy", function(d){return d.y})
-			.attr("r", 5) // az x és y koordináták elvieg a layout.force-ból jönnek!
+			.attr("r", 5) // az x és y koordináták a layout.force-ból jönnek!
 			.attr("id", function(d){return d.name})
 			.attr("fill", function(d){return d.color})
-			/*.style("fill", function(d) { return d.color; });*/
 			.call(force.drag);
+
+	// pulse for selected words!			
+	//var selected = d3.selectAll("circle.word")
+		// links at JS&stuff
+		// lehessen klikkre kijelölni adjunk hozzá pulzálást, vagy legalább legyen először valami más színű!
+
+	//doubleklick-re vegye fel a szót a selected list-re.
+	// amikor a pulse()-t meghívjuk, gombnyomás vagy on/off és magát..., akkor a selected words koordinátáin
+	// adjunk új circle-öket az svg-hez, és transit:r++ & fade. csá. 
 
 
 //----------------------------------------
+
+	function birth(word){
+		var i = words_dead.indexOf(word)
+		words_dead.splice(i,1)
+		words_alive.push(word)
+
+		
+
+		word_dots.data(words_alive).enter()
+		.append("circle")
+		  	.attr("class","word")
+            .attr("cx", function(d){return d.x})
+            .attr("cy", function(d){return d.y})
+			.attr("r", function(d){return d.r}) // az x és y koordináták a layout.force-ból jönnek!
+			.attr("id", function(d){return d.name})
+			.attr("fill", function(d){return d.color})
+			.call(force.drag);
+
+		force.nodes(words_alive).start();
+
+	};
+
+
+	function death(){}
+
+
+
 	function tick(e) {
 		console.log("tick!")
 		var k = 0.04 * e.alpha;
 
 		// Push nodes toward their designated focus.
-		words.forEach(function(o, i) {
-
+		words_alive.forEach(function(o, i) {
+			if (i === 3){
+				console.log(o)
+			}
 
 			//o.color = color(curr_act);
-			//console.log([o.x, o.y])
 			o.y += (clusters[o.cluster].yy - o.y) * k; // itt updateli a focinak megfelelően!
 			o.x += (clusters[o.cluster].xx - o.x) * k;	// akkor nem tudom mi történik a timerben cx-szel, de mindegy is.
 		});
 
-		// ok, e.alpha folyamatosan csökken, minden tick-nél.
-		// mégis kell az a damper?
 
 		word_dots
 			  .each(collide(.5))
 			  /*.style("fill", function(d) { return d.color; })*/
-		  .attr("cx", function(d) { return d.x; })
+		  .attr("cx", function(d) {console.log(d.name); return d.x; })
 		  .attr("cy", function(d) { return d.y; });
 		}
 
 
 	// Resolve collisions between nodes.
 	function collide(alpha) {					// alpha is a coolig parameter. 
-	  var quadtree = d3.geom.quadtree(words);	
+	  var quadtree = d3.geom.quadtree(words_alive);	
 	  return function(d) {
 	    var r = d.r + maxRadius + padding + 10,
 	        nx1 = d.x - r,
@@ -235,25 +269,30 @@ function draw(data) {
 
 	// add more word_dots 		   - done. for now
 	// add random colors, for fun  - done
-	// ----------------------------------
 	
-	// add more complex word objects
-		// create chedules for them
-		// make update function connect buttons
+	// add more complex word objects - done
+	// create chedules for them  - done 
+	// connect update function to buttons - done
+	// ----------------------------------
+
+	
+	// add word birth and death:
 			// ellenőrizni kell, hogy ki él és ki nem,
 				// aki meghalt, annak kell egy death_transit function
 				// aki születik, akkak meg egy birth_stransit.
 
-// there might be some flow problems with word birth and death
-// bizony, és nem is tudok vele haladni, amíg nem beszélünk róla egy kicsit. flow.
-// 600.000+ szó, az lehet, hogy para, de akkor hogy lesz kisebb az adat?
 
+
+// 600.000+ szó, az lehet, hogy para, de akkor hogy lesz kisebb az adat?
+	// a clusterek kréméjét fogjuk megjeleníteni...
 
 
 // later but super important!
 	// lehessen gombbal és autoplay-jel is haladni az időben
 	// legyen érthető, szép idősáv, amin követhető, hogy hol tartunk
 	// legyenek meg az időben széthúzott hisztogrammok (milyen jellemzők?)
+	
+
 	// lehessen kiválasztani egyes szavakat
 		// pulzáljon szépen (elhaló koncentrikus körök vagy ilyesmi) 
 			//(lehessen közben kijelölni újakat követésre, kattintással, és oldalt legyen nekik hely, ahol összefolalja az infókat róla!)
