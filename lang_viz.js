@@ -14,8 +14,8 @@ var clusters = [
 var words = [
 	{"name" : "w1", "x"	: 100, "y"	: 201, "cluster": 1, "r":5, "sched":[1,1,2,0]},
 	{"name" : "w2", "x"	: 200, "y"	: 202, "cluster": 2, "r":5, "sched":[2,0,1,2]},
-	{"name" : "w7", "x" : 234, "y"	: 101, "cluster": -1, "r":3, "sched":[-1,-1,0,1]},
-	{"name" : "w8", "x" : 204, "y"	: 11, "cluster": 1, "r":30, "sched":[1,-1,1,-1]}
+	{"name" : "w7", "x" : 234, "y"	: 101, "cluster": -1, "r":30, "sched":[-1,-1,0,1]},
+	{"name" : "w8", "x" : 204, "y"	: 11, "cluster": 1, "r":10, "sched":[1,-1,1,-1]}
 	]
 
 // generate more fake words, for testing
@@ -201,12 +201,14 @@ function draw(data) {
 		chart_disp.selectAll("circle.word").data(words_alive, function(d){return d.name;})
 		.enter()
 		.append("circle")
-		  	.attr("class","word")
+			.attr("class","word")
             .attr("cx", function(d){return d.x})
             .attr("cy", function(d){return d.y})
 			.attr("id", function(d){return d.name})
 			.attr("fill", function(d){return d.color})
-			.attr("r", function(d){return d.r})
+			.attr("r", 1)
+		.transition().duration(2000)
+		  	.attr("r", function(d){return d.r})
 			.call(force.drag);
 	};
 
