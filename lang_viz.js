@@ -14,7 +14,8 @@ var clusters = [
 var words = [
 	{"name" : "w1", "x"	: 100, "y"	: 201, "cluster": 1, "r":5, "sched":[1,1,2,0]},
 	{"name" : "w2", "x"	: 200, "y"	: 202, "cluster": 2, "r":5, "sched":[2,0,1,2]},
-	{"name" : "w7", "x" : 234, "y"	: 101, "cluster": -1, "r":10, "sched":[-1,-1,0,1]}
+	{"name" : "w7", "x" : 234, "y"	: 101, "cluster": -1, "r":10, "sched":[-1,-1,0,1]},
+	{"name" : "w8", "x" : 204, "y"	: 11, "cluster": -1, "r":10, "sched":[-1,-1,-1,1]}
 	]
 
 // generate more fake words, for testing
@@ -33,7 +34,6 @@ d3.range(1).map(function(i){
 
 var words_alive = []
 var words_dead  = []
-var word_dots;
 
 
 // now init "cluster" and sched[0] hold the same value, but one is for current pos, one is for memory!
@@ -90,6 +90,8 @@ function draw(data) {
 	function update_words(){
 		// check who is alive: call death and birth functions.
 		// ----------------------
+		var d_list = []
+		var b_list = []
 		d3.range(words.length).map(function(i){
 			//w = words[i]
 			// console.log(words[i].name)
@@ -98,16 +100,28 @@ function draw(data) {
 
 			words[i].cluster = words[i].sched[win] // ezt majd az alive-ban akarjuk frissíteni! illetve mindegy.
 			
-			if (last_clust === -1 && words[i].cluster !== -1){
-				birth(words[i])
-			}
 			if (last_clust !== -1 && words[i].cluster === -1){
-				death(words[i])
+				d_list.push(words[i])
+			}
+			if (last_clust === -1 && words[i].cluster !== -1){
+				b_list.push(words[i])
 			}
 
 			force.resume()
 		});
-	}
+		console.log(b_list)
+
+		if (b_list.length>0){
+			birth(b_list)
+		}
+		if (d_list.length>0){
+		death(d_list)
+		}
+		d_list = []
+		b_list = []
+		console.log(b_list)
+
+	};
 
 
 	chart_disp.selectAll("circle.cluster")
@@ -151,7 +165,7 @@ function draw(data) {
 		.on("tick", tick)
 		.start();
 
-	word_dots = chart_disp.selectAll("circle.word")
+	chart_disp.selectAll("circle.word") // var word_dots removed.
 		.data(words_alive)
 	  	.enter()
 	  	.append("circle")
@@ -175,24 +189,27 @@ function draw(data) {
 
 //----------------------------------------
 
-	function birth(word){
-		var i = words_dead.indexOf(word)
-		words_dead.splice(i,1)
-		words_alive.push(word)
+	function birth(b_list){
+		/*console.log(word_dots)*/
+		b_list.forEach(function(o,i){
+			var id = words_dead.indexOf(o);
+			words_dead.splice(id,1);
+			words_alive.push(o);
+		});
 
+		force.nodes(words_alive).start();	
 		
 
-		word_dots.data(words_alive).enter()
+		chart_disp.selectAll("circle.word").data(words_alive).enter()
 		.append("circle")
 		  	.attr("class","word")
             .attr("cx", function(d){return d.x})
             .attr("cy", function(d){return d.y})
-			.attr("r", function(d){return d.r}) // az x és y koordináták a layout.force-ból jönnek!
 			.attr("id", function(d){return d.name})
 			.attr("fill", function(d){return d.color})
+			.attr("r", function(d){return d.r})
 			.call(force.drag);
 
-		force.nodes(words_alive).start();
 
 	};
 
@@ -207,20 +224,21 @@ function draw(data) {
 
 		// Push nodes toward their designated focus.
 		words_alive.forEach(function(o, i) {
-			if (i === 3){
+		/*	if (i === 3){
 				console.log(o)
-			}
+			}*/
 
 			//o.color = color(curr_act);
 			o.y += (clusters[o.cluster].yy - o.y) * k; // itt updateli a focinak megfelelően!
-			o.x += (clusters[o.cluster].xx - o.x) * k;	// akkor nem tudom mi történik a timerben cx-szel, de mindegy is.
+			o.x += (clusters[o.cluster].xx - o.x) * k;
 		});
 
-
-		word_dots
+		//console.log(word_dots) // akkor itt csinálok egy új selectiont
+		//word_dots
+		chart_disp.selectAll("circle.word")
 			  .each(collide(.5))
 			  /*.style("fill", function(d) { return d.color; })*/
-		  .attr("cx", function(d) {console.log(d.name); return d.x; })
+		  .attr("cx", function(d) { return d.x; }) //console.log(d.name);
 		  .attr("cy", function(d) { return d.y; });
 		}
 
