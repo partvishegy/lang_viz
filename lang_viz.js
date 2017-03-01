@@ -32,8 +32,9 @@ d3.range(1).map(function(i){
 		})
 	});
 
-var words_alive = []
-var words_dead  = []
+var selected_words = []
+	words_alive = []
+	words_dead  = []
 
 
 // now init "cluster" and sched[0] hold the same value, but one is for current pos, one is for memory!
@@ -186,7 +187,58 @@ function draw(data) {
 	// adjunk új circle-öket az svg-hez, és transit:r++ & fade. csá. 
 
 
-//----------------------------------------
+	chart_disp.selectAll("circle.word")
+		.on("dblclick", select_word)
+
+	function select_word(e){
+		console.log(e.name)
+		var sel = d3.select("#" + e.name)
+
+		if (!sel.classed("selected_word")){
+			sel.classed("selected_word", true)
+			selected_words.push(e)
+		}else{
+			sel.classed("selected_word", false)
+			var i = selected_words.indexOf(e)
+			selected_words.splice(i,1)
+
+		};
+	};
+
+	// PULSE button
+	d3.select("#pulse")
+		.on("click", function(){
+
+		console.log("PUSLE clicked!")
+
+		var pulses = chart_disp.selectAll("circle.pulse")
+			.data(selected_words, function(d){return d.name})
+			.enter()
+			.append("circle")
+			.attr("class", "pulse")
+			.attr("cx", function(d){return d.x})
+			.attr("cy", function(d){return d.y})
+			.attr("r", function(d){return d.r})
+			.attr("pointer-events", "none")
+			.attr("fill", "hsla(0, 0%, 0%, 0)")
+			.attr("stroke", "hsla(120, 100%, 20%, 0.7)")
+			.attr("stroke-width", 5);
+
+
+		pulses.transition().duration(1000).ease("linear")
+			.attr("r", 150)
+			.style('opacity', 1)
+			.attr("stroke-width", 0)
+			.remove()
+
+		});
+
+
+
+
+
+
+
 
 	function birth(b_list){
 		b_list.forEach(function(o,i){
@@ -198,7 +250,7 @@ function draw(data) {
 		force.nodes(words_alive).start();	
 		
 
-		chart_disp.selectAll("circle.word").data(words_alive, function(d){return d.name;})
+		var them = chart_disp.selectAll("circle.word").data(words_alive, function(d){return d.name;})
 		.enter()
 		.append("circle")
 			.attr("class","word")
@@ -206,10 +258,13 @@ function draw(data) {
             .attr("cy", function(d){return d.y})
 			.attr("id", function(d){return d.name})
 			.attr("fill", function(d){return d.color})
-			.attr("r", 1)
-		.transition().duration(2000)
+			.attr("r", 1);
+
+		them.transition().duration(2000)
 		  	.attr("r", function(d){return d.r})
 			.call(force.drag);
+		// the transition still gives a seemingly irrelevant typeError. this may cause problems.
+		// if so, we can get rid of the transition, and just let the newborns pop up.
 	};
 
 
@@ -311,7 +366,7 @@ function draw(data) {
 
 
 
-// 600.000+ szó, az lehet, hogy para, de akkor hogy lesz kisebb az adat?
+	// 600.000+ szó, az lehet, hogy para, de akkor hogy lesz kisebb az adat?
 	// a clusterek kréméjét fogjuk megjeleníteni...
 
 

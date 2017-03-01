@@ -18,3 +18,12 @@
 	fill:white;
 	stroke:lightgrey;
 }
+
+#empty_div{
+	float:left;
+	border:solid black;
+	border-width:3px;
+	width:50px;
+	height:25px;
+
+}
