@@ -88,6 +88,17 @@ function draw(data) {
 			.attr("cy", function(d){return d.yy})
 			.attr("r", 40)
 
+
+
+
+	// Define the div for the tooltip
+	var div = d3.select("body").append("div")	
+	    .attr("class", "tooltip")				
+	    .style("opacity", 0);
+
+
+
+
 	// navigational buttons
 	d3.select("#forth")
 		.on("click", function(){
@@ -139,6 +150,24 @@ function draw(data) {
 			.call(force.drag)
 			.on("dblclick", select_word);
 
+	// add tooltip
+	chart_disp.selectAll("circle.word")
+	.on("mouseover", function(d) {
+			d3.select("#" + d.name).attr("fill", "blue")
+            div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div	.html(d.name + "<br/>"  + d.cluster)	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            })					
+        .on("mouseout", function(d) {
+        	d3.select("#" + d.name).attr("fill", d.color)	
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
+
 
 	function update_words(){
 		// update sched, check who is alive, call death and birth.
@@ -186,7 +215,8 @@ function draw(data) {
 		var newborns = chart_disp.selectAll("circle.word").data(words_alive, function(d){return d.name;})
 		.enter()
 		.append("circle")
-			.attr("class","word")
+			.attr("class", function(d){if (selected_words.indexOf(d)>=0){return "word selected_word";
+						   			  }else{return "word";};};)
             .attr("cx", function(d){return d.x})
             .attr("cy", function(d){return d.y})
 			.attr("id", function(d){return d.name})
@@ -197,6 +227,24 @@ function draw(data) {
 
 		newborns.transition().duration(2000)
 		  	.attr("r", function(d){return d.r});
+
+		// add tooltip
+		chart_disp.selectAll("circle.word")
+			.on("mouseover", function(d) {
+				d3.select("#" + d.name).attr("fill", "blue")	
+	            div.transition()		
+	                .duration(200)		
+	                .style("opacity", .9);		
+	            div	.html(d.name + "<br/>"  + d.cluster + "<br/>"  + d.r)	
+	                .style("left", (d3.event.pageX) + "px")		
+	                .style("top", (d3.event.pageY - 28) + "px");	
+	            })					
+	        .on("mouseout", function(d) {
+	        	d3.select("#" + d.name).attr("fill", d.color)	
+	            div.transition()		
+	                .duration(500)		
+	                .style("opacity", 0);
+	        });
 			
 		// the transition still gives a seemingly irrelevant typeError. this may cause problems.
 		// if so, we can get rid of the transition, and just let the newborns pop up.
@@ -338,7 +386,7 @@ function draw(data) {
 	// fix consistency of pulse and drag - done
 	// ----------------------------------
 
-	// add zoom and drag to svg
+	// add zoom and drag to svg: ha marad idő. (see JS & stuff.txt, és minimal_zoom.html)
 	// add a neat timeline!
 	//jslint!
 
