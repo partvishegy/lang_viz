@@ -15,8 +15,7 @@ var words = [
 	{"name" : "w1", "x"	: 100, "y"	: 201, "cluster": 1, "r":5, "sched":[1,1,2,0]},
 	{"name" : "w2", "x"	: 200, "y"	: 202, "cluster": 2, "r":5, "sched":[2,0,1,2]},
 	{"name" : "w7", "x" : 234, "y"	: 101, "cluster": -1, "r":30, "sched":[-1,-1,0,1]},
-	{"name" : "w8", "x" : 204, "y"	: 11, "cluster": 1, "r":10, "sched":[1,-1,1,-1]}
-	]
+	{"name" : "w8", "x" : 204, "y"	: 11, "cluster": 1, "r":10, "sched":[1,-1,1,-1]}]
 
 // generate more fake words, for testing
 d3.range(1).map(function(i){
@@ -28,9 +27,9 @@ d3.range(1).map(function(i){
 		  "r": 5,
 		  "sched": Array.apply(null, {length: 4}).map(Function.call, // updeate length with last_win
 		   function(){return Math.ceil(Math.random()*clusters.length-1)})
-
 		})
 	});
+
 
 var selected_words = []
 	words_alive = []
@@ -88,16 +87,10 @@ function draw(data) {
 			.attr("cy", function(d){return d.yy})
 			.attr("r", 40)
 
-
-
-
-	// Define the div for the tooltip
+	// define div for tooltip
 	var div = d3.select("body").append("div")	
 	    .attr("class", "tooltip")				
 	    .style("opacity", 0);
-
-
-
 
 	// navigational buttons
 	d3.select("#forth")
@@ -136,6 +129,8 @@ function draw(data) {
 		.on("tick", tick)
 		.start();
 
+	//birth(words_alive);
+
 	// words alive in init state
 	chart_disp.selectAll("circle.word")
 		.data(words_alive)
@@ -149,24 +144,16 @@ function draw(data) {
 			.attr("fill", function(d){return d.color})
 			.call(force.drag)
 			.on("dblclick", select_word);
+    tooltip();
 
-	// add tooltip
-	chart_disp.selectAll("circle.word")
-	.on("mouseover", function(d) {
-			d3.select("#" + d.name).attr("fill", "blue")
-            div.transition()		
-                .duration(200)		
-                .style("opacity", .9);		
-            div	.html(d.name + "<br/>"  + d.cluster)	
-                .style("left", (d3.event.pageX) + "px")		
-                .style("top", (d3.event.pageY - 28) + "px");	
-            })					
-        .on("mouseout", function(d) {
-        	d3.select("#" + d.name).attr("fill", d.color)	
-            div.transition()		
-                .duration(500)		
-                .style("opacity", 0);	
-        });
+    d3.select("#time").on("input", function() {
+    	update_time(+this.value);
+    });
+
+    function update_time(t) {console.log("time updated by slide! woooooot!"  + t)}
+    // add values to slider according to data: last_win
+    // connect to win value
+    // connect back & forth with slider!
 
 
 	function update_words(){
@@ -215,8 +202,11 @@ function draw(data) {
 		var newborns = chart_disp.selectAll("circle.word").data(words_alive, function(d){return d.name;})
 		.enter()
 		.append("circle")
-			.attr("class", function(d){if (selected_words.indexOf(d)>=0){return "word selected_word";
-						   			  }else{return "word";};};)
+			.attr("class", function(d){
+				if (selected_words.indexOf(d)>=0){
+					return "word selected_word";
+				}else{
+				  	return "word"}})
             .attr("cx", function(d){return d.x})
             .attr("cy", function(d){return d.y})
 			.attr("id", function(d){return d.name})
@@ -224,28 +214,10 @@ function draw(data) {
 			.attr("r", 1)
 			.call(force.drag)
 			.on("dblclick", select_word);
+		tooltip();
 
 		newborns.transition().duration(2000)
 		  	.attr("r", function(d){return d.r});
-
-		// add tooltip
-		chart_disp.selectAll("circle.word")
-			.on("mouseover", function(d) {
-				d3.select("#" + d.name).attr("fill", "blue")	
-	            div.transition()		
-	                .duration(200)		
-	                .style("opacity", .9);		
-	            div	.html(d.name + "<br/>"  + d.cluster + "<br/>"  + d.r)	
-	                .style("left", (d3.event.pageX) + "px")		
-	                .style("top", (d3.event.pageY - 28) + "px");	
-	            })					
-	        .on("mouseout", function(d) {
-	        	d3.select("#" + d.name).attr("fill", d.color)	
-	            div.transition()		
-	                .duration(500)		
-	                .style("opacity", 0);
-	        });
-			
 		// the transition still gives a seemingly irrelevant typeError. this may cause problems.
 		// if so, we can get rid of the transition, and just let the newborns pop up.
 	};
@@ -265,6 +237,26 @@ function draw(data) {
 			.attr("r", 0)
 			.remove()
 	};
+
+	// add tooltip to words
+	function tooltip(){
+	chart_disp.selectAll("circle.word")
+	.on("mouseover", function(d) {
+			d3.select("#" + d.name).attr("fill", "blue")
+            div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div	.html(d.name + "<br/>cluster:"  + d.cluster + "<br/>freq:"  + d.r)	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            })					
+        .on("mouseout", function(d) {
+        	d3.select("#" + d.name).attr("fill", d.color)	
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
+    };
 
 
 	function select_word(e){
@@ -318,7 +310,8 @@ function draw(data) {
 
 		// Push nodes toward their designated focus.
 		words_alive.forEach(function(o, i) {
-
+/*			console.log(o.name)
+			console.log(o.cluster)*/
 			// approach cluster focus
 			o.y += (clusters[o.cluster].yy - o.y) * k; 
 			o.x += (clusters[o.cluster].xx - o.x) * k;
@@ -384,14 +377,17 @@ function draw(data) {
 	// add word selection - done
 	// add pulse 		- done
 	// fix consistency of pulse and drag - done
+	// add tooltip
+
 	// ----------------------------------
 
-	// add zoom and drag to svg: ha marad idő. (see JS & stuff.txt, és minimal_zoom.html)
+
 	// add a neat timeline!
-	//jslint!
+	// add zoom and drag to svg: ha marad idő. (see JS & stuff.txt, és minimal_zoom.html)
+	// jslint!
 
 
-	//(lehessen közben kijelölni újakat követésre, kattintással, és oldalt legyen nekik hely, ahol összefolalja az infókat róla!)
+	// oldalt legyen hely a szavaknak, ahol összefolalja az infókat róla
 	// esetleg legyen egy path/history function, ami behúz egy vonalat akorbban látogatott clusterek között!
 	
 
