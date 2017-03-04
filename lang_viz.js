@@ -20,7 +20,7 @@ var words = [
 // generate more fake words, for testing
 d3.range(30	).map(function(i){
 	words.push(
-		{"name":"w".concat(i+3),
+		{"name":"w".concat(i+9),
 		  "x": Math.ceil(Math.random()*400),
 		  "y": Math.ceil(Math.random()*300),
 		  "cluster": Math.ceil(Math.random()*clusters.length-1),
@@ -192,6 +192,8 @@ function draw(data) {
 		d_list = []
 		b_list = []
 		console.log(b_list)
+
+		update_info_divs()
 	};
 
 
@@ -277,22 +279,27 @@ function draw(data) {
 			selected_words.splice(i,1)
 		};
 
+		update_info_divs()
 
-		// this needs a separate function.
+	};
+
+	function update_info_divs(){
+				// this needs a separate function.
 		d3.selectAll("div.selected_w_div")
 			.data(selected_words)
-			.style("background", "yellow")
-
+			.style("background", function(d){if (d.cluster==-1){
+												return "lightgrey"
+											}else{	
+												return "yellow"}})
 			.html(function(d){return "<b>"+d.name+"</b>" + "</br>current cluster: "  + d.cluster + "<br/>last five clusters:<br/>" + d.sched})
 				.on("click", pulse_me
-					/*function(e){
-					console.log("lol")
-				}*/
 				);
 	};
 
 	function pulse_me(e){
-		var let_pulse = Array(e)
+		if (e.cluster !== -1){
+			var let_pulse = Array(e)
+		}
 		pulse(let_pulse);
 	};
 
