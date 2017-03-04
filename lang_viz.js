@@ -275,8 +275,12 @@ function draw(data) {
 			sel.classed("selected_word", false)
 			var i = selected_words.indexOf(e)
 			selected_words.splice(i,1)
-
 		};
+
+		d3.selectAll("div.selected_w_div")
+			.data(selected_words)
+			.style("background", "yellow")
+			.html(function(d){return "<b>"+d.name+"</b>" + "<br/>current cluster:"  + d.cluster + "<br/>last five clusters:<br/>" + d.sched});
 	};
 	
 

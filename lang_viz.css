@@ -40,10 +40,17 @@ div.tooltip {
     pointer-events: none;			
 }
 
-#time_slider_div{
-	float:bottom;
-	width: 900px;
-	height: 100px;
+div.selected_w_div{
+    text-align: left;
+    margin: 2px;
+    width: 160px;					
+    height: 60px;					
+    padding: 3px;				
+    font: 12px sans-serif;		
+    background: lightsteelblue;	
+    border: solid black 1px;		
+    border-radius: 10px;
+    float: left;	
 }
 
 /*--------------------------------------*/
