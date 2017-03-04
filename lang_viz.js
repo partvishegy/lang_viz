@@ -18,7 +18,7 @@ var words = [
 	{"name" : "w8", "x" : 204, "y"	: 11, "cluster": 1, "r":10, "sched":[1,-1,1,-1]}]
 
 // generate more fake words, for testing
-d3.range(1).map(function(i){
+d3.range(30	).map(function(i){
 	words.push(
 		{"name":"w".concat(i+3),
 		  "x": Math.ceil(Math.random()*400),
@@ -38,7 +38,7 @@ var selected_words = []
 
 // add (random) color to words
 words.map(function(d){
-	console.log(d)
+	/*console.log(d)*/
 	var h = Math.ceil(Math.random() * 360)
 	d.color = "hsla("+h.toString()+", 100%, 20%, 0.5)";
 });
@@ -53,7 +53,7 @@ function draw(data) {
 	var last_win = words[0].sched.length-1
 	// data[data.length-1].birth + data[data.length-1].xx.length -1
 
-	var dimensions = {width: 750, height: 400}
+	var dimensions = {width: 750, height: 500}
 
 	// set up main svg container
 	var chart_disp = d3.select("#chart_disp")//.style("border", "dashed black")
@@ -118,8 +118,8 @@ function draw(data) {
 		});
 
 	// PULSE button
-	d3.select("#pulse")
-		.on("click", pulse);
+	d3.select("#pulse_button")
+		.on("click", pulse_all);
 
 
 	// init force layout 
@@ -277,22 +277,37 @@ function draw(data) {
 			selected_words.splice(i,1)
 		};
 
+
+		// this needs a separate function.
 		d3.selectAll("div.selected_w_div")
 			.data(selected_words)
 			.style("background", "yellow")
-			.html(function(d){return "<b>"+d.name+"</b>" + "<br/>current cluster:"  + d.cluster + "<br/>last five clusters:<br/>" + d.sched});
-	};
-	
 
-	function pulse(){
+			.html(function(d){return "<b>"+d.name+"</b>" + "</br>current cluster: "  + d.cluster + "<br/>last five clusters:<br/>" + d.sched})
+				.on("click", pulse_me
+					/*function(e){
+					console.log("lol")
+				}*/
+				);
+	};
+
+	function pulse_me(e){
+		var let_pulse = Array(e)
+		pulse(let_pulse);
+	};
+
+	function pulse_all(){
+		var let_pulse = selected_words.filter(function(el){
+		  return words_dead.indexOf(el) < 0;
+		});
+		pulse(let_pulse);
+	}
+	
+	function pulse(let_p){
 		console.log("PUSLE clicked!")
 
-		var let_pulse = selected_words.filter( function( el ) {
-		  return words_dead.indexOf( el ) < 0;
-		});
-
 		var pulses = chart_disp.selectAll("circle.pulse")
-			.data(let_pulse, function(d){return d.name}) // set op? "{selected | selected not dead} ?"
+			.data(let_p, function(d){return d.name}) // set op? "{selected | selected not dead} ?"
 			.enter()
 			.append("circle")
 			.attr("class", "pulse")
@@ -388,7 +403,7 @@ function draw(data) {
 	// fix consistency of pulse and drag - done
 	// add tooltip
 	// add time-slide, connect it fully - done
-
+	// add info divs, individual pulse!
 	// ----------------------------------
 
 
