@@ -49,7 +49,7 @@ div.tooltip {
 /*--------------------------------------*/
 input[type=range].time_slider {
   -webkit-appearance: none;
-  width: 80%;
+  width: 60%;
   margin: 12px 20px;
 }
 

@@ -36,7 +36,6 @@ var selected_words = []
 	words_dead  = []
 
 
-
 // add (random) color to words
 words.map(function(d){
 	console.log(d)
@@ -63,13 +62,12 @@ function draw(data) {
 			.attr("height", dimensions.height);
 
 
-	win = 0; // update window value with back and forth buttons!
+	win = 0; // update window value with back and forth buttons & slide!
 	console.log(win)
 
 
 	// sort words to alive and dead lists
 	words.forEach(function(w){
-		//console.log(w)
 		if (w.cluster === -1){
 			words_dead.push(w)
 		}else{
@@ -99,6 +97,9 @@ function draw(data) {
 				win+=1
 			}
 		update_words()
+
+		//update slide pos
+		$("#time").val(win)
 		
 		console.log(win)
 		});
@@ -109,6 +110,9 @@ function draw(data) {
 				win-=1
 			}
 		update_words()
+
+		//update slide pos
+		$("#time").val(win)
 
 		console.log(win)
 		});
@@ -129,8 +133,6 @@ function draw(data) {
 		.on("tick", tick)
 		.start();
 
-	//birth(words_alive);
-
 	// words alive in init state
 	chart_disp.selectAll("circle.word")
 		.data(words_alive)
@@ -150,15 +152,18 @@ function draw(data) {
     	update_time(+this.value);
     });
 
-    function update_time(t) {console.log("time updated by slide! woooooot!"  + t)}
-    // add values to slider according to data: last_win
-    // connect to win value
-    // connect back & forth with slider!
-
+    //update time by slide
+    function update_time(t){
+    	console.log("time updated by slide! woooooot!"  + t)
+    	win = t;
+    	d3.select("#time").on("mouseup", update_words);
+    };
 
 	function update_words(){
 		// update sched, check who is alive, call death and birth.
 		// ----------------------
+		$("p#t").text("t = " + win)
+
 		var d_list = []
 		var b_list = []
 
@@ -378,11 +383,12 @@ function draw(data) {
 	// add pulse 		- done
 	// fix consistency of pulse and drag - done
 	// add tooltip
+	// add time-slide, connect it fully - done
 
 	// ----------------------------------
 
 
-	// add a neat timeline!
+	// add ticks and clever time tags to timeline!
 	// add zoom and drag to svg: ha marad idő. (see JS & stuff.txt, és minimal_zoom.html)
 	// jslint!
 

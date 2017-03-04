@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+<!DOCTYPE html5>
 <html>
 	<head>
 		<meta charset="utf-8">
 		<link rel="stylesheet" type="text/css" href="lang_viz.css">
 		<script src="https://d3js.org/d3.v3.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 		<!-- <script src="d3/d3.js"></script> --> <!-- a force layouttal problémék vannak a v4-ben! -->
 		<script type="text/javascript" src="lang_viz.js"></script> <!-- this is the draw function. -->
 	</head>
@@ -15,11 +16,12 @@
 			<div class="button" id="forth">forth</div>
 			<!-- <div class="empty_div" id="empty_div">    </div> -->
 			<div class="button" id="pulse">PULSE</div>
-			<div class="range-slider">
-  				<input class="time_slider" id="time" type="range" value="0" min="0" max="3" step="1">
-  				<span class="time_slider_value">0</span>
-			</div>
 		</div>
+		<form ><div>
+			<input class="time_slider" value="0" oninput="win=rangeInput.value" id="time" type="range" min="0" max="3" name="rangeInput" />
+    	</div></form>
+
+    	<p id="t">t = 0</p>
 
 
 		<script>
