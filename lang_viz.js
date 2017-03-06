@@ -75,6 +75,7 @@ function draw(data) {
 
     //improve clickability
     var rect = chart_disp.append("rect")
+    .attr("class", "drag_zoom")
     .attr("width", dimensions.width)
     .attr("height", dimensions.height)
     .style("fill", "none")
@@ -184,7 +185,7 @@ function draw(data) {
 			.attr("r", function(d){return d.r})
 			.attr("id", function(d){return d.name})
 			.attr("fill", function(d){return d.color})
-			.call(force.drag)
+			.call(drag)
 			.on("dblclick", select_word);
     tooltip();
 
@@ -259,7 +260,7 @@ function draw(data) {
 			.attr("id", function(d){return d.name})
 			.attr("fill", function(d){return d.color})
 			.attr("r", 1)
-			.call(force.drag)
+			.call(drag)
 			.on("dblclick", select_word);
 		tooltip();
 
@@ -324,7 +325,6 @@ function draw(data) {
 	};
 
 	function update_info_divs(){
-				// this needs a separate function.
 		d3.selectAll("div.selected_w_div")
 			.data(selected_words)
 			.style("background", function(d){if (d.cluster==-1){
@@ -430,12 +430,11 @@ function draw(data) {
 	function dragstarted(d){
 		d3.event.sourceEvent.stopPropagation();
 		d3.select(this).classed("dragging", true);
+		force.resume()
 	};
-
 	function dragged(d){
 		d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
 	};
-
 	function dragended(d){
 		d3.select(this).classed("dragging", false);
 	};
@@ -469,19 +468,17 @@ function draw(data) {
 	// add tooltip
 	// add time-slide, connect it fully - done
 	// add info divs, individual pulse!
+	// add zoom and drag to svg
 	// ----------------------------------
 
-
+	// use real data, and thik of a way to arrange the clusters
 	// add ticks and clever time tags to timeline!
-	// add zoom and drag to svg: ha marad idő. (see JS & stuff.txt, és minimal_zoom.html)
+	
 	// jslint!
 
-
-	// oldalt legyen hely a szavaknak, ahol összefolalja az infókat róla
 	// esetleg legyen egy path/history function, ami behúz egy vonalat akorbban látogatott clusterek között!
 	
 
-	// 600.000+ szó, az lehet, hogy para, de akkor hogy lesz kisebb az adat?
 	// a clusterek kréméjét fogjuk megjeleníteni...
 		// az lenne valószínűleg ideális, ha csak azok a clusterek jelennének meg, amikben valaha előfordul
 		// a kiválasztott szavak valamelyike
