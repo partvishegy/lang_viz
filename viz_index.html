@@ -1,12 +1,12 @@
 <!DOCTYPE html5>
 <html>
-	<head>
+<head>
 		<meta charset="utf-8">
-		<link rel="stylesheet" type="text/css" href="lang_viz.css">
+		{% load static %}
+		<link rel="stylesheet" type="text/css" href="{% static 'css/lang_viz.css' %}">
 		<script src="https://d3js.org/d3.v3.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-		<!-- <script src="d3/d3.js"></script> --> <!-- a force layouttal problémék vannak a v4-ben! -->
-		<script type="text/javascript" src="lang_viz.js"></script> <!-- this is the draw function. -->
+		<script type="text/javascript" src="{% static 'js/lang_viz.js' %}"></script>
 	</head>
 	<body>
 		<div id="chart_disp"></div>
@@ -14,7 +14,6 @@
 		<div id="control">
 			<div class="button" id="back">back</div>
 			<div class="button" id="forth">forth</div>
-			<!-- <div class="empty_div" id="empty_div">    </div> -->
 			<div class="button pulse" id="pulse_button">PULSE</div>
 		</div>
 		<form ><div>
@@ -36,7 +35,7 @@
 
 		<script>
 			d3.json("./data/fake_clusters_01.json", draw);
-			/*d3.json("../to_pi_viz_sigma.json", draw);*/
+/*			d3.json("../to_viz_sigma.json", draw);*/
 		</script>
 	</body>
 </html>
