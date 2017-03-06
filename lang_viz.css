@@ -53,6 +53,13 @@ div.selected_w_div{
     float: left;	
 }
 
+.axis line {
+  fill: none;
+  stroke: #ddd;
+  shape-rendering: crispEdges;
+  vector-effect: non-scaling-stroke;
+}
+
 /*--------------------------------------*/
 input[type=range].time_slider {
   -webkit-appearance: none;

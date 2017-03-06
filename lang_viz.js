@@ -55,11 +55,51 @@ function draw(data) {
 
 	var dimensions = {width: 750, height: 500}
 
+	//svg behaviour
+	var zoom = d3.behavior.zoom()
+	    .scaleExtent([1, 10])
+	    .on("zoom", zoomed);
+	var drag = d3.behavior.drag()
+	    .origin(function(d) { return d; })
+	    .on("dragstart", dragstarted)
+	    .on("drag", dragged)
+	    .on("dragend", dragended);
+
 	// set up main svg container
 	var chart_disp = d3.select("#chart_disp")//.style("border", "dashed black")
 		.append("svg")
 			.attr("width", dimensions.width)
-			.attr("height", dimensions.height);
+			.attr("height", dimensions.height)
+		.append("g")
+    		.call(zoom);
+
+    //improve clickability
+    var rect = chart_disp.append("rect")
+    .attr("width", dimensions.width)
+    .attr("height", dimensions.height)
+    .style("fill", "none")
+    .style("pointer-events", "all");
+
+    // improve visibility - just for testing!
+    var container = chart_disp.append("g");
+    container.append("g")
+	    .attr("class", "x axis")
+	  .selectAll("line")
+	    .data(d3.range(0, dimensions.width, 10))
+	  .enter().append("line")
+	    .attr("x1", function(d) { return d; })
+	    .attr("y1", 0)
+	    .attr("x2", function(d) { return d; })
+	    .attr("y2", dimensions.height);
+	container.append("g")
+	    .attr("class", "y axis")
+	  .selectAll("line")
+	    .data(d3.range(0, dimensions.height, 10))
+	  .enter().append("line")
+	    .attr("x1", 0)
+	    .attr("y1", function(d) { return d; })
+	    .attr("x2", dimensions.width)
+	    .attr("y2", function(d) { return d; });
 
 
 	win = 0; // update window value with back and forth buttons & slide!
@@ -76,7 +116,7 @@ function draw(data) {
 	});
 
 	// cluster areas: just for testing (?)
-	chart_disp.selectAll("circle.cluster")
+	container.selectAll("circle.cluster")
 		.data(clusters)
 		.enter()
 		.append("circle")
@@ -134,7 +174,7 @@ function draw(data) {
 		.start();
 
 	// words alive in init state
-	chart_disp.selectAll("circle.word")
+	container.selectAll("circle.word")
 		.data(words_alive)
 	  	.enter()
 	  	.append("circle")
@@ -152,7 +192,7 @@ function draw(data) {
     	update_time(+this.value);
     });
 
-    //update time by slide
+    //update time by slide position
     function update_time(t){
     	console.log("time updated by slide! woooooot!"  + t)
     	win = t;
@@ -206,7 +246,7 @@ function draw(data) {
 
 		force.nodes(words_alive).start();	
 		
-		var newborns = chart_disp.selectAll("circle.word").data(words_alive, function(d){return d.name;})
+		var newborns = container.selectAll("circle.word").data(words_alive, function(d){return d.name;})
 		.enter()
 		.append("circle")
 			.attr("class", function(d){
@@ -237,7 +277,7 @@ function draw(data) {
 			words_dead.push(o);
 		});
 
-		chart_disp.selectAll("circle.word").data(words_alive, function(d){return d.name;})
+		container.selectAll("circle.word").data(words_alive, function(d){return d.name;})
 		.exit()	// use "key function" for object consistency
 			.transition()
 			.duration(2000)
@@ -313,7 +353,7 @@ function draw(data) {
 	function pulse(let_p){
 		console.log("PUSLE clicked!")
 
-		var pulses = chart_disp.selectAll("circle.pulse")
+		var pulses = container.selectAll("circle.pulse")
 			.data(let_p, function(d){return d.name}) // set op? "{selected | selected not dead} ?"
 			.enter()
 			.append("circle")
@@ -380,6 +420,24 @@ function draw(data) {
 	      return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
 	    });
 	  };
+	};
+
+	// svg behaviour functions
+	function zoomed(){
+  		container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+	};
+
+	function dragstarted(d){
+		d3.event.sourceEvent.stopPropagation();
+		d3.select(this).classed("dragging", true);
+	};
+
+	function dragged(d){
+		d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+	};
+
+	function dragended(d){
+		d3.select(this).classed("dragging", false);
 	};
 	//----------------------------------------
 
