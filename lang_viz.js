@@ -60,7 +60,6 @@ function draw(data) {
 	cc = data.c
 
 	win = 0; // update window value with back and forth buttons & slide!
-
 	
 	// add cluster property to words
 	words.map(function(d){
@@ -70,7 +69,7 @@ function draw(data) {
 		}else{
 			d.cluster = d.route[win]
 		};
-		d.r = Math.log(d.relfreqs[0]*1000000)
+		d.r = Math.log(d.relfreqs[win]*1000000)+1
 
 		/*d.cluster = d.route[0]*/
 
@@ -89,41 +88,6 @@ function draw(data) {
 		}
 	});
 
-/*	routes = []
-
-	words.forEach(function(w){
-		console.log(typeof(w.route))
-		var r_list = w.route.replace("[", "").replace("]", "").split(", ")
-		//console.log(r_list)
-		//routes.concat(r_list)
-		console.log(r_list)
-	})
-	console.log(routes)
-	clusters = routes.unique()
-
-	console.log(clusters)*/
-
-	/*ehhez kelleni fog az összes sched*/
-
-
-	// a meglévő clustereknek csinálunk egy db force layoutot. ami utána nem változik.
-	// a clusterek halálát akkor nem is kell kezelni, mert csak nem lesz ott senki.
-	// arra viszont figyelni kell, hogy beférjenek a vászonra. ebben még nem vagyok biztos, de rájövünk.
-
-	// mi van még? a prezi. ha lesz rá idő. de ha nem, akkor is van mit mutatnom.
-
-
-
-
-
-
-
-	// and then never again.
-	// asszem itt egy jó magas e kell majd
-
-	// utána hogy érem el a ficikat?
-	// simán az objectekből, vagy a ki kell gyűjtenem őket?
-
 
 
 	
@@ -131,7 +95,7 @@ function draw(data) {
 
 	var last_win = words[0].route.length-1
 	// data[data.length-1].birth + data[data.length-1].xx.length -1
-
+	d3.select("#time").attr("max",last_win)
 
 	//svg behaviour
 	var zoom = d3.behavior.zoom()
@@ -161,7 +125,9 @@ function draw(data) {
 
     // improve visibility - just for testing!
     var container = chart_disp.append("g");
-    container.append("g")
+
+    //add grid for zoom testing
+/*    container.append("g")
 	    .attr("class", "x axis")
 	  .selectAll("line")
 	    .data(d3.range(0, dimensions.width, 10))
@@ -178,7 +144,7 @@ function draw(data) {
 	    .attr("x1", 0)
 	    .attr("y1", function(d) { return d; })
 	    .attr("x2", dimensions.width)
-	    .attr("y2", function(d) { return d; });
+	    .attr("y2", function(d) { return d; });*/
 
 
 
@@ -299,7 +265,7 @@ function draw(data) {
 		  	.attr("class","word")
             .attr("cx", function(d){return d.x})
             .attr("cy", function(d){return d.y})
-			.attr("r", function(d){return Math.log(d.relfreqs[0]*1000000)})
+			.attr("r", function(d){return Math.log(d.relfreqs[win]*1000000)+1})
 			.attr("id", function(d){return d.name})
 			.attr("fill", function(d){return d.color})
 			.call(drag)
@@ -348,14 +314,15 @@ function draw(data) {
 		d3.range(words.length).map(function(i){
 			var w = words[i]
 			var last_clust = w.cluster
-			console.log("faaaaaaaaaa")
-			console.log(data.c.indexOf(w.route[win]))
+			/*console.log("faaaaaaaaaa")
+*/			console.log(data.c.indexOf(w.route[win]))
 
 			// words can not go to clusters that are not included. sorry wordld (később lefolyó)
 			if (data.c.indexOf(w.route[win])<0 ){
 				w.cluster = -1;
 			}else{
 				w.cluster = w.route[win]
+				w.r = Math.log(w.relfreqs[win]*1000000)+1
 			};
 			
 			if (last_clust !== -1 && w.cluster === -1){
@@ -476,7 +443,7 @@ function draw(data) {
 												return "lightgrey"
 											}else{	
 												return "yellow"}})
-			.html(function(d){return "<b>"+d.name+"</b>" + "</br>current cluster: "  + d.cluster + "<br/>last five clusters:<br/>" + d.route})
+			.html(function(d){return "<b>"+d.name+"</b>" + "</br>current cluster: "  + d.cluster + "<br/>last five clusters:<br/>..." }) //d.route
 				.on("click", pulse_me
 				);
 	};
@@ -547,7 +514,6 @@ function draw(data) {
 
 	// Resolve collisions between nodes.
 	function collide(alpha) {// alpha is a coolig parameter.
-		console.log("lakjsdflkajdflkajdslfkjasdlfkjasldkfjalkdfjalsdkfj")
 	  var quadtree = d3.geom.quadtree(words_alive);	
 	  return function(d) {
 	    var r = d.r + maxRadius + padding + 10,
