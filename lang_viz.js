@@ -4,21 +4,23 @@ var padding = 3,	// think about these plz.
 	maxRadius = 3;
 
 // define fixed clusters - make dynamic later
-var clusters = [
+var clusters = []; /*= [
 	{name: 0, xx:150, yy:280},
 	{name: 1, xx:360, yy:120},
 	{name: 2, xx:570, yy:280}
-	]
+	]*/
 
 // sample word data
-var words = [
-	{"name" : "w1", "x"	: 100, "y"	: 201, "cluster": 1, "r":5, "sched":[1,1,2,0]},
+var words;/* = [
+	{"name" : "w1", "x"	: 100, "y"	: 201, "cluster": 1, "r":5, "sched":[1,1,2,0]}
+	]*/
+	/*,
 	{"name" : "w2", "x"	: 200, "y"	: 202, "cluster": 2, "r":5, "sched":[2,0,1,2]},
 	{"name" : "w7", "x" : 234, "y"	: 101, "cluster": -1, "r":30, "sched":[-1,-1,0,1]},
-	{"name" : "w8", "x" : 204, "y"	: 11, "cluster": 1, "r":10, "sched":[1,-1,1,-1]}]
+	{"name" : "w8", "x" : 204, "y"	: 11, "cluster": 1, "r":10, "sched":[1,-1,1,-1]}]*/
 
 // generate more fake words, for testing
-d3.range(30	).map(function(i){
+/*d3.range(30	).map(function(i){
 	words.push(
 		{"name":"w".concat(i+9),
 		  "x": Math.ceil(Math.random()*400),
@@ -28,36 +30,112 @@ d3.range(30	).map(function(i){
 		  "sched": Array.apply(null, {length: 4}).map(Function.call, // updeate length with last_win
 		   function(){return Math.ceil(Math.random()*clusters.length-1)})
 		})
-	});
+	});*/
 
 
 var selected_words = []
 	words_alive = []
 	words_dead  = []
 
+	/*{{ selected_words }}*/
+	/* {{pi vagy sigma}} */
+
 
 // add (random) color to words
-words.map(function(d){
-	/*console.log(d)*/
+/*words.map(function(d){
 	var h = Math.ceil(Math.random() * 360)
 	d.color = "hsla("+h.toString()+", 100%, 20%, 0.5)";
 });
-
+*/
 var word_count = words_alive.legth // update in update birth and death.
+
+
+var cc;
 
 
 function draw(data) {
 	"use strict"
 	console.log(data)
+	words = data.words
+	cc = data.c
 
-	var last_win = words[0].sched.length-1
+	win = 0; // update window value with back and forth buttons & slide!
+
+	
+	// add cluster property to words
+	words.map(function(d){
+
+		if (data.c.indexOf(d.route[win])<0 ){
+			d.cluster = -1;
+		}else{
+			d.cluster = d.route[win]
+		};
+		d.r = Math.log(d.relfreqs[0]*1000000)
+
+		/*d.cluster = d.route[0]*/
+
+		// get rid of this later --> uniform cluster color
+		var h = Math.ceil(Math.random() * 360)
+		d.color = "hsla("+h.toString()+", 100%, 20%, 0.5)";
+	});
+
+	// sort words to alive and dead lists
+	words.forEach(function(w){
+		if (w.cluster === -1){
+			words_dead.push(w)
+		}else{
+			words_alive.push(w)
+			console.log(w)
+		}
+	});
+
+/*	routes = []
+
+	words.forEach(function(w){
+		console.log(typeof(w.route))
+		var r_list = w.route.replace("[", "").replace("]", "").split(", ")
+		//console.log(r_list)
+		//routes.concat(r_list)
+		console.log(r_list)
+	})
+	console.log(routes)
+	clusters = routes.unique()
+
+	console.log(clusters)*/
+
+	/*ehhez kelleni fog az összes sched*/
+
+
+	// a meglévő clustereknek csinálunk egy db force layoutot. ami utána nem változik.
+	// a clusterek halálát akkor nem is kell kezelni, mert csak nem lesz ott senki.
+	// arra viszont figyelni kell, hogy beférjenek a vászonra. ebben még nem vagyok biztos, de rájövünk.
+
+	// mi van még? a prezi. ha lesz rá idő. de ha nem, akkor is van mit mutatnom.
+
+
+
+
+
+
+
+	// and then never again.
+	// asszem itt egy jó magas e kell majd
+
+	// utána hogy érem el a ficikat?
+	// simán az objectekből, vagy a ki kell gyűjtenem őket?
+
+
+
+	
+	var dimensions = {width: $(window).width(), height:550}
+
+	var last_win = words[0].route.length-1
 	// data[data.length-1].birth + data[data.length-1].xx.length -1
 
-	var dimensions = {width: 750, height: 500}
 
 	//svg behaviour
 	var zoom = d3.behavior.zoom()
-	    .scaleExtent([1, 10])
+	    .scaleExtent([0.3, 10])
 	    .on("zoom", zoomed);
 	var drag = d3.behavior.drag()
 	    .origin(function(d) { return d; })
@@ -103,28 +181,6 @@ function draw(data) {
 	    .attr("y2", function(d) { return d; });
 
 
-	win = 0; // update window value with back and forth buttons & slide!
-	console.log(win)
-
-
-	// sort words to alive and dead lists
-	words.forEach(function(w){
-		if (w.cluster === -1){
-			words_dead.push(w)
-		}else{
-			words_alive.push(w)
-		}
-	});
-
-	// cluster areas: just for testing (?)
-	container.selectAll("circle.cluster")
-		.data(clusters)
-		.enter()
-		.append("circle")
-			.attr("class", "cluster")
-			.attr("cx", function(d){return d.xx})
-			.attr("cy", function(d){return d.yy})
-			.attr("r", 40)
 
 	// define div for tooltip
 	var div = d3.select("body").append("div")	
@@ -162,10 +218,71 @@ function draw(data) {
 	d3.select("#pulse_button")
 		.on("click", pulse_all);
 
+	d3.select("#time").on("input", function(){
+    	update_time(+this.value);
+   	});
 
-	// init force layout 
+
+
+	// cluster areas: just for testing (?)
+/*	container.selectAll("circle.cluster")
+		.data(clusters)
+		.enter()
+		.append("circle")
+			.attr("class", "cluster")
+			.attr("cx", function(d){return d.xx})
+			.attr("cy", function(d){return d.yy})
+			.attr("r", 40)*/
+
+
+
+	// generate cluster objects
+	d3.range(data.c.length).map(function(i){
+	clusters.push(
+				{"name": data.c[i],
+				  "xx": Math.ceil(Math.random()*dimensions.width),	// vigyázat lejjebb még xx-et és yy-t keres!
+				  "yy": Math.ceil(Math.random()*dimensions.height),
+				  "r": 25
+				})
+	});
+
+
+
+// ---------------------------------------------
+	// force layout for cluster layout
+    var cluster_force = d3.layout.force()
+    	.nodes(clusters)
+    	//.links()
+        .size([dimensions.width, dimensions.height]) //ennek kell sokkal nagyobbnak lennie, mint az svd-nek! (?)
+        .gravity(0.018)
+        .charge(-90)
+        .on("tick", cluster_tick);
+
+    // it fogjuk hozzáadni a clustereket, a domhoz!
+    	// ha egyáltalán meg akarujuk tartani majd őket a domban!
+	container.selectAll("circle.cluster")
+		.data(clusters)
+	  	.enter()
+	  	.append("circle")
+		  	.attr("class","cluster")
+            .attr("cx", function(d){return d.xx})
+            .attr("cy", function(d){return d.yy})
+			.attr("r", function(d){return d.r})
+			.attr("id", function(d){return "c_" + d.name}) // proper coversion?
+			//.style("fill", "blue") // for now, but it shouldnt
+
+
+	cluster_force.start();
+// ---------------------------------------------
+
+
+	/*setTimeout(load_words, 5000);*/
+
 	var force = d3.layout.force()
-		.nodes(words_alive)
+
+	/*function load_words(){*/
+	// init force layout 
+	force.nodes(words_alive)
 		.size([dimensions.width, dimensions.height])
 		// .links([])
 		.gravity(0)
@@ -182,16 +299,36 @@ function draw(data) {
 		  	.attr("class","word")
             .attr("cx", function(d){return d.x})
             .attr("cy", function(d){return d.y})
-			.attr("r", function(d){return d.r})
+			.attr("r", function(d){return Math.log(d.relfreqs[0]*1000000)})
 			.attr("id", function(d){return d.name})
 			.attr("fill", function(d){return d.color})
 			.call(drag)
 			.on("dblclick", select_word);
     tooltip();
 
-    d3.select("#time").on("input", function() {
-    	update_time(+this.value);
-    });
+	/*};*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // funcions ---------------------------------------------
+
+	function cluster_tick(){
+	    container.selectAll("circle.cluster")
+	    	.attr("cx", function (d){return d.x;})
+	        .attr("cy", function (d){return d.y;});
+	};
 
     //update time by slide position
     function update_time(t){
@@ -211,7 +348,15 @@ function draw(data) {
 		d3.range(words.length).map(function(i){
 			var w = words[i]
 			var last_clust = w.cluster
-			w.cluster = w.sched[win]
+			console.log("faaaaaaaaaa")
+			console.log(data.c.indexOf(w.route[win]))
+
+			// words can not go to clusters that are not included. sorry wordld (később lefolyó)
+			if (data.c.indexOf(w.route[win])<0 ){
+				w.cluster = -1;
+			}else{
+				w.cluster = w.route[win]
+			};
 			
 			if (last_clust !== -1 && w.cluster === -1){
 				d_list.push(w)
@@ -331,7 +476,7 @@ function draw(data) {
 												return "lightgrey"
 											}else{	
 												return "yellow"}})
-			.html(function(d){return "<b>"+d.name+"</b>" + "</br>current cluster: "  + d.cluster + "<br/>last five clusters:<br/>" + d.sched})
+			.html(function(d){return "<b>"+d.name+"</b>" + "</br>current cluster: "  + d.cluster + "<br/>last five clusters:<br/>" + d.route})
 				.on("click", pulse_me
 				);
 	};
@@ -381,21 +526,28 @@ function draw(data) {
 
 		// Push nodes toward their designated focus.
 		words_alive.forEach(function(o, i) {
-/*			console.log(o.name)
-			console.log(o.cluster)*/
-			// approach cluster focus
-			o.y += (clusters[o.cluster].yy - o.y) * k; 
-			o.x += (clusters[o.cluster].xx - o.x) * k;
-		});
+			//console.log(o.cluster)
 
-		chart_disp.selectAll("circle.word") //words_dots selection
+			/*
+			o.y += (clusters[o.cluster].yy - o.y) * k;
+			o.x += (clusters[o.cluster].xx - o.x) * k;*/
+			o.y += (clusters[cc.indexOf(o.cluster)].y - o.y) * k;
+			o.x += (clusters[cc.indexOf(o.cluster)].x - o.x) * k;
+
+		});
+	// asszem megvan a bug: a clusterek eddig sorban voltak. most id alapján kell azonosítani őket!
+	// egyel szofisztikáltabb select kell
+
+
+		container.selectAll("circle.word") //words_dots selection
 			  .each(collide(.5))
 		  .attr("cx", function(d){return d.x}) //console.log(d.name);
 		  .attr("cy", function(d){return d.y});
 	};
 
 	// Resolve collisions between nodes.
-	function collide(alpha) {// alpha is a coolig parameter. 
+	function collide(alpha) {// alpha is a coolig parameter.
+		console.log("lakjsdflkajdflkajdslfkjasdlfkjasldkfjalkdfjalsdkfj")
 	  var quadtree = d3.geom.quadtree(words_alive);	
 	  return function(d) {
 	    var r = d.r + maxRadius + padding + 10,
