@@ -23,6 +23,7 @@ src:local('Sharp'),
 
 #control{
 	float:top;
+  border:solid orange;
 }
 
 
@@ -43,7 +44,7 @@ src:local('Sharp'),
 }
 
 .axis text {
-  font: 12px sans-serif;
+  font: 12px /*sans-serif*/;
 }
 
 .axis path,
@@ -99,12 +100,12 @@ div.selected_w_div{
     float: left;	/*bottom*/
 }
 
-.axis line {
+/*.axis line {
   fill: none;
   stroke: #ddd;
   shape-rendering: crispEdges;
   vector-effect: non-scaling-stroke;
-}
+}*/
 
 /*--------------------------------------*/
 input[type=range].time_slider {

@@ -1,4 +1,5 @@
-var win, cc, padding = 3, maxRadius = 3;
+var win, cc, padding = 3, maxRadius = 3, 
+	start_date = new Date(2007,0,1)
 
 
 // define fixed clusters - make dynamic later
@@ -220,7 +221,7 @@ function draw(data) {
 	    height = 22 - margin.top - margin.bottom;
 
 	var x = d3.time.scale()
-	    .domain([new Date(2007,0,1), new Date(2068,0,1)])
+	    .domain([new Date(2007,0,1), new Date(2027,0,1)])
 	    .nice(d3.time.year)
 	    .range([0, width]);
 
@@ -253,7 +254,10 @@ function draw(data) {
 
 	function update_words(){
 		// update sched, check who is alive, call death and birth.
-		$("p#t").text("t = " + win);
+		var w_s = start_date.addDays(win),
+			w_e = start_date.addDays(win+30)
+		$("p#t").text("Time Window: " + w_s.getFullYear()+"."+("00" + (w_s.getMonth()+1)).slice(-2)+"."+w_s.getDate()
+								 +" - "+w_e.getFullYear()+"."+("00" + (w_s.getMonth()+1)).slice(-2)+"."+w_e.getDate());
 
 		var d_list = [];
 		var b_list = [];
@@ -496,6 +500,16 @@ function draw(data) {
 	function dragended(d){
 		d3.select(this).classed("dragging", false);
 	}
+
+	Date.prototype.addDays = function(days) {
+	  var dat = new Date(this.valueOf());
+	  dat.setDate(dat.getDate() + days);
+	  return dat;
+	}
+
+/*	var dat = new Date();
+
+	alert(dat.addDays(5))*/
 	//----------------------------------------
 
 } // end of draw
