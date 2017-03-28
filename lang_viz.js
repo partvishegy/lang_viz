@@ -68,7 +68,7 @@ function draw(data) {
 		// get rid of this later --> uniform cluster color
 		var h = Math.ceil(Math.random() * 360);
 		d.color = "hsla("+h.toString()+", 100%, 20%, 0.5)";
-	});
+	});	
 
 	// sort words to alive and dead lists
 	words.forEach(function(w){
@@ -81,11 +81,11 @@ function draw(data) {
 	});
 
 
-	var dimensions = {width: $(window).width(), height:$(window).height()-350};
+	var dimensions = {width: $(window).width()-22, height:$(window).height()-220};
 
 	var last_win = words[0].route.length-1;
 	// data[data.length-1].birth + data[data.length-1].xx.length -1
-	d3.select("#time").attr("max",last_win);
+	d3.select("#time").attr("max",last_win);	
 
 	//svg behaviour
 	var zoom = d3.behavior.zoom()
@@ -100,8 +100,8 @@ function draw(data) {
 	// set up main svg container
 	var chart_disp = d3.select("#chart_disp")//.style("border", "dashed black")
 		.append("svg")
-			.attr("width", dimensions.width)
-			.attr("height", dimensions.height)
+			.attr("width", $('#chart_disp').width()-20)
+			.attr("height", $('#chart_disp').height()-20)
 		.append("g")
     		.call(zoom);
 
@@ -213,6 +213,27 @@ function draw(data) {
 			.call(drag)
 			.on("dblclick", select_word);
     tooltip();
+
+    //add timescale
+    var margin = {top: 28, right: 100, bottom: 10, left: 10}, //top=30!!
+	    width = $("#time").width()-5, 								// kérje le a slider méretét + igazítás
+	    height = 22 - margin.top - margin.bottom;
+
+	var x = d3.time.scale()
+	    .domain([new Date(2007,0,1), new Date(2068,0,1)])
+	    .nice(d3.time.year)
+	    .range([0, width]);
+
+	var time_scale_svg = d3.select("#tscale_svg").append("svg")
+	    .attr("width", width + margin.left + margin.right)
+	    .attr("height", height + margin.top + margin.bottom)
+	  .append("g")
+	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	time_scale_svg.append("g")
+	    .attr("class", "x axis")
+	    .call(d3.svg.axis().scale(x).orient("top"));
+
 
 
 

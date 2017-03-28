@@ -19,16 +19,23 @@
 		<script type="text/javascript" src="{% static 'js/lang_viz.js' %}"></script>
 	</head> -->
 	<body>
-		<div id="chart_disp"></div>
+
+		<div id="chart_disp"></div>	
+		<div id="time_disp">
+	    	<div id="tscale_svg"></div>
+			<form ><div>
+				<input class="time_slider" value="0" oninput="win=rangeInput.value" id="time" type="range" min="0" max="3" name="rangeInput" />
+	    	</div></form>
+		</div>
+
 		<!-- <div id="hist_disp"></div> -->
+		
 		<div id="control">
 			<div class="button" id="back">back</div>
 			<div class="button" id="forth">forth</div>
-			<div class="button pulse" id="pulse_button">PULSE</div>
+			<div class="button pulse" id="pulse_button">PULSE</div>	
 		</div>
-		<form ><div>
-			<input class="time_slider" value="0" oninput="win=rangeInput.value" id="time" type="range" min="0" max="3" name="rangeInput" />
-    	</div></form>
+		
 
     	<!-- show me the time -->
     	<p id="t">t = 0</p>
@@ -42,7 +49,7 @@
     		<div class="selected_w_div" id="sw5"></div>
     	</div>
 
-
+    	
 		<script>
 			d3.json("./data/gyur_bar.json", draw);
 /*			d3.json("../to_viz_sigma.json", draw);*/
