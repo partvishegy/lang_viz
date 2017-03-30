@@ -46,6 +46,9 @@ var selected_words = [];
 
 	/*{{ selected_words }}*/
 	/* {{pi vagy sigma}} */
+	/* {{start date}} */
+	/* {{end date}} */
+	/* {{window size for the date intervals}} */
 
 
 function draw(data) {
@@ -77,7 +80,7 @@ function draw(data) {
 			words_dead.push(w);
 		}else{
 			words_alive.push(w);
-			console.log(w);
+			/*console.log(w);*/
 		}
 	});
 
@@ -273,7 +276,7 @@ function draw(data) {
 			var w = words[i];
 			var last_clust = w.cluster;
 
-			console.log(data.c.indexOf(w.route[win]));
+			/*console.log(data.c.indexOf(w.route[win]));*/
 
 			// words can not go to clusters that are not included. sorry wordld (később lefolyó)
 			if (data.c.indexOf(w.route[win])<0 ){
@@ -307,7 +310,6 @@ function draw(data) {
 		}
 		d_list = [];
 		b_list = [];
-		console.log(b_list);
 
 		update_info_divs();
 	}
@@ -430,8 +432,8 @@ function draw(data) {
 	function pulse_me(e){
 		var let_pulse = Array(e);
 		if (e.cluster !== -1){
-		}
 		pulse(let_pulse);
+		}
 	}
 
 	function pulse_all(){
@@ -442,7 +444,7 @@ function draw(data) {
 	}
 	
 	function pulse(let_p){
-		console.log("PUSLE clicked!");
+		console.log("PULSE clicked!");
 
 		var pulses = container.selectAll("circle.pulse")
 			.data(let_p, function(d){return d.name;})
@@ -459,7 +461,7 @@ function draw(data) {
 
 
 		pulses.transition().duration(1000).ease("linear")
-			.attr("r", 150)
+			.attr("r", 1000)
 			.style('opacity', 1)
 			.attr("stroke-width", 0)
 			.remove();
