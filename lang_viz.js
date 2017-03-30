@@ -407,7 +407,62 @@ function draw(data) {
 		}
 
 		update_info_divs();
+		update_perm_tooltip();
 	}
+
+	function update_perm_tooltip(){
+		/*d3.select(".selected_word").attr("fill", "blue")*/
+		container.selectAll(".perm.tooltip")
+		.data(selected_words, function(d){return d.name;})
+		.enter()
+		.append("rect")
+			.attr("class", "perm tooltip")
+			.attr("id", function(d){return d.name + "_tt"})
+			.attr("x", function(d){return place_tt(d).x}).attr("rx", 2)
+			.attr("y", function(d){return place_tt(d).y}).attr("ry", 2)
+			.attr("width", 25)
+			.attr("height", 10)
+			.style("fill", "lightsteelblue")
+			.style("opacity", 0.9);
+
+		container.selectAll(".vonal")
+		.data(selected_words, function(d){return d.name;})
+		.enter()
+		.append("line")
+			.attr("class", "vonal")
+			.attr("id", function(d){return d.name + "_vonal"})
+			.attr("x1", function(d){return place_tt(d).pp.x})
+			.attr("y1", function(d){return place_tt(d).pp.y})
+			.attr("x1", function(d){return place_tt(d).oo.x})
+			.attr("y1", function(d){return place_tt(d).oo.y})
+			.style("stroke","rgb(255,0,0)")
+			.style("stroke-width", 5);
+
+	}
+
+	// calculate place of permanent tooltip relative to the word based on word-cluster relation
+	function place_tt(wd){
+		var o,p,l1,l2,h,theta,out;
+		o  = {x: clusters[cc.indexOf(wd.cluster)].x, y: clusters[cc.indexOf(wd.cluster)].y};
+		p  = {x: wd.x, y:wd.y}
+		l1 = p.x-o.x
+		l2 = p.y-o.y
+		h  = Math.sqrt(l1*l1+l2*l2)	// hypotenuse
+		theta = Math.acos(l1/h);
+		out = {x:Math.cos(theta)*100, y:Math.sin(theta)*100, pp:p, oo:o}
+
+		// kvadráns szerint még igazíthatunk, hogy a legközelebbi sarokhoz kapcsolódjon majd a vonal!
+
+
+		// azért nem működik, mert a word objectnek statikusak a coordinátái.
+		// a circle dom-object alapján kell frissíteni. ehhez majd kell egy okos select a place_tt-be!
+
+		return out
+
+	}
+
+
+
 
 	function update_info_divs(){
 		d3.selectAll("div.selected_w_div")
