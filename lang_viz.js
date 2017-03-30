@@ -370,10 +370,18 @@ function draw(data) {
             div.transition()		
                 .duration(200)		
                 .style("opacity", 0.9);
-            div	.html(d.name + "<br/>cluster:"  + d.cluster + "<br/>freq:"  + d.relfreqs[win])	
+            div	.html("<b>" + d.name + "</b>" + "<br/>cluster: "  + d.cluster + "<br/>freq: "  + d.relfreqs[win])	
                 .style("left", (d3.event.pageX) + "px")		
-                .style("top", (d3.event.pageY - 28) + "px");
-            })					
+                .style("top", (d3.event.pageY - 28) + "px")
+                .style("width",
+                	function(){
+                		if(d.name.length<10){
+	                		width = "80px"
+	                	}else{
+	                		width = 80+(d.name.length-10)*5 + "px"
+	                	}
+	                return width});
+            })
         .on("mouseout", function(d) {
         	d3.select("#" + d.name).attr("fill", d.color);
             div.transition()		
