@@ -63,7 +63,7 @@ src:local('Sharp'),
 }
 
 #time_disp{
-  border:solid red;
+  border:solid blue;
   width:95%;
   height:50px;
   /*float:top;*/

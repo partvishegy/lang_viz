@@ -101,12 +101,12 @@ function draw(data) {
 	// set up main svg container
 	var chart_disp = d3.select("#chart_disp")//.style("border", "dashed black")
 		.append("svg")
-			.attr("width", $('#chart_disp').width()-20)
-			.attr("height", $('#chart_disp').height()-20)
+			.attr("width", $('#chart_disp').width()-5)
+			.attr("height", $('#chart_disp').height()-5)
 		.append("g")
     		.call(zoom);
 
-    //improve clickability
+    //improve clickability0
     var rect = chart_disp.append("rect")
     .attr("class", "drag_zoom")
     .attr("width", dimensions.width)
@@ -119,7 +119,7 @@ function draw(data) {
 
 	// define div for tooltip
 	var div = d3.select("body").append("div")	
-	    .attr("class", "tooltip")				
+	    .attr("class", "tooltip")
 	    .style("opacity", 0);
 
 	// navigational buttons
@@ -235,6 +235,10 @@ function draw(data) {
 	    .attr("class", "x axis")
 	    .call(d3.svg.axis().scale(x).orient("top"));
 
+	var s_end_date = start_date.addDays(30)
+	$("p#t").text("Time Window: " + start_date.getFullYear()+"."+("00" + (start_date.getMonth()+1)).slice(-2)+"."+("00" + start_date.getDate()).slice(-2)
+							 +" - "+s_end_date.getFullYear()+"."+("00" + (s_end_date.getMonth()+1)).slice(-2)+"."+("00" + s_end_date.getDate()).slice(-2));
+
 
 
 
@@ -256,8 +260,8 @@ function draw(data) {
 		// update sched, check who is alive, call death and birth.
 		var w_s = start_date.addDays(win),
 			w_e = start_date.addDays(win+30)
-		$("p#t").text("Time Window: " + w_s.getFullYear()+"."+("00" + (w_s.getMonth()+1)).slice(-2)+"."+w_s.getDate()
-								 +" - "+w_e.getFullYear()+"."+("00" + (w_s.getMonth()+1)).slice(-2)+"."+w_e.getDate());
+		$("p#t").text("Time Window: " + w_s.getFullYear()+"."+("00" + (w_s.getMonth()+1)).slice(-2)+"."+("00" + w_s.getDate()).slice(-2)
+								 +" - "+w_e.getFullYear()+"."+("00" + (w_e.getMonth()+1)).slice(-2)+"."+("00" + w_e.getDate()).slice(-2));
 
 		var d_list = [];
 		var b_list = [];
@@ -285,7 +289,12 @@ function draw(data) {
 
 			force.resume();
 		});
-		console.log(b_list);
+		//console.log(b_list);
+
+		container.selectAll("circle.word")
+			.transition().duration(1000)
+			.attr("r", function(d){return Math.log(d.relfreqs[win]*1000000)+1;})
+
 
 		if (b_list.length>0){
 			birth(b_list);
@@ -501,11 +510,7 @@ function draw(data) {
 		d3.select(this).classed("dragging", false);
 	}
 
-	Date.prototype.addDays = function(days) {
-	  var dat = new Date(this.valueOf());
-	  dat.setDate(dat.getDate() + days);
-	  return dat;
-	}
+
 
 /*	var dat = new Date();
 
@@ -513,3 +518,9 @@ function draw(data) {
 	//----------------------------------------
 
 } // end of draw
+
+Date.prototype.addDays = function(days) {
+  var dat = new Date(this.valueOf());
+  dat.setDate(dat.getDate() + days);
+  return dat;
+}
