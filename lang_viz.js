@@ -128,6 +128,7 @@ function draw(data) {
 			if (win!=last_win){
 				win+=1;
 			}
+		update_date(start_date, win, 30);
 		update_words();
 
 		//update slide pos
@@ -141,6 +142,7 @@ function draw(data) {
 			if (win!==0){
 				win-=1;
 			}
+		update_date(start_date, win, 30);
 		update_words();
 
 		//update slide pos
@@ -217,7 +219,7 @@ function draw(data) {
 
     //add timescale
     var margin = {top: 28, right: 100, bottom: 10, left: 10}, //top=30!!
-	    width = $("#time").width()-5, 								// kérje le a slider méretét + igazítás
+	    width = $("#time").width()-5, 
 	    height = 22 - margin.top - margin.bottom;
 
 	var x = d3.time.scale()
@@ -235,14 +237,23 @@ function draw(data) {
 	    .attr("class", "x axis")
 	    .call(d3.svg.axis().scale(x).orient("top"));
 
-	var s_end_date = start_date.addDays(30)
+	/*var s_end_date = start_date.addDays(30)
 	$("p#t").text("Time Window: " + start_date.getFullYear()+"."+("00" + (start_date.getMonth()+1)).slice(-2)+"."+("00" + start_date.getDate()).slice(-2)
 							 +" - "+s_end_date.getFullYear()+"."+("00" + (s_end_date.getMonth()+1)).slice(-2)+"."+("00" + s_end_date.getDate()).slice(-2));
-
-
+*/
+	update_date(start_date, win, 30);
 
 
     // ---------------------------------------------
+    function update_date(start_date, win_id, win_size){
+    	var w_s = start_date.addDays(win),
+			w_e = start_date.addDays(win+win_size)
+    	$("p#t").text("Time Window: " + w_s.getFullYear()+"."+("00" + (w_s.getMonth()+1)).slice(-2)+"."+("00" + w_s.getDate()).slice(-2)
+								 +" - "+w_e.getFullYear()+"."+("00" + (w_e.getMonth()+1)).slice(-2)+"."+("00" + w_e.getDate()).slice(-2));
+
+    }
+
+
 	function cluster_tick(){
 	    container.selectAll("circle.cluster")
 	    	.attr("cx", function (d){return d.x;})
@@ -253,15 +264,13 @@ function draw(data) {
     function update_time(t){
     	console.log("time updated by slide! woooooot!"  + t);
     	win = t;
+    	update_date(start_date, win, 30);
     	d3.select("#time").on("mouseup", update_words);
     }
 
 	function update_words(){
 		// update sched, check who is alive, call death and birth.
-		var w_s = start_date.addDays(win),
-			w_e = start_date.addDays(win+30)
-		$("p#t").text("Time Window: " + w_s.getFullYear()+"."+("00" + (w_s.getMonth()+1)).slice(-2)+"."+("00" + w_s.getDate()).slice(-2)
-								 +" - "+w_e.getFullYear()+"."+("00" + (w_e.getMonth()+1)).slice(-2)+"."+("00" + w_e.getDate()).slice(-2));
+		/*update_date(start_date, win, 30);*/
 
 		var d_list = [];
 		var b_list = [];
@@ -293,7 +302,7 @@ function draw(data) {
 
 		container.selectAll("circle.word")
 			.transition().duration(1000)
-			.attr("r", function(d){return Math.log(d.relfreqs[win]*1000000)+1;})
+			.attr("r", function(d){return Math.log(d.relfreqs[win]*1000000)+1	;})
 
 
 		if (b_list.length>0){
