@@ -378,7 +378,7 @@ function draw(data) {
                 		if(d.name.length<10){
 	                		width = "80px"
 	                	}else{
-	                		width = 80+(d.name.length-10)*5 + "px"
+	                		width = 80+(d.name.length-10)*6 + "px"
 	                	}
 	                return width});
             })
@@ -414,8 +414,16 @@ function draw(data) {
 												return "lightgrey";
 											}else{	
 												return "yellow";}})
-			.html(function(d){return "<b>"+d.name+"</b>" + "</br>current cluster: "  + d.cluster + "<br/>last five clusters:<br/>...";}) //d.route
-				.on("click", pulse_me
+			.html(function(d){
+				var behind = jQuery.unique(d.route.slice(0, win)).slice(0,3),
+					ahead  = jQuery.unique(d.route.slice(win+1, d.route.length)).slice(0,3)
+
+				return 	"<b>"+d.name+"</b>"
+						+ "</br>current cluster: " + d.cluster
+						+ "<br/>behind: " + behind.join(", ")
+						+ "<br/>ahead: "  + ahead.join(", ");
+			})
+			.on("click", pulse_me
 				);
 	}
 
