@@ -237,10 +237,6 @@ function draw(data) {
 	    .attr("class", "x axis")
 	    .call(d3.svg.axis().scale(x).orient("top"));
 
-	/*var s_end_date = start_date.addDays(30)
-	$("p#t").text("Time Window: " + start_date.getFullYear()+"."+("00" + (start_date.getMonth()+1)).slice(-2)+"."+("00" + start_date.getDate()).slice(-2)
-							 +" - "+s_end_date.getFullYear()+"."+("00" + (s_end_date.getMonth()+1)).slice(-2)+"."+("00" + s_end_date.getDate()).slice(-2));
-*/
 	update_date(start_date, win, 30);
 
 
@@ -250,9 +246,7 @@ function draw(data) {
 			w_e = start_date.addDays(win+win_size)
     	$("p#t").text("Time Window: " + w_s.getFullYear()+"."+("00" + (w_s.getMonth()+1)).slice(-2)+"."+("00" + w_s.getDate()).slice(-2)
 								 +" - "+w_e.getFullYear()+"."+("00" + (w_e.getMonth()+1)).slice(-2)+"."+("00" + w_e.getDate()).slice(-2));
-
     }
-
 
 	function cluster_tick(){
 	    container.selectAll("circle.cluster")
@@ -302,7 +296,7 @@ function draw(data) {
 
 		container.selectAll("circle.word")
 			.transition().duration(1000)
-			.attr("r", function(d){return Math.log(d.relfreqs[win]*1000000)+1	;})
+			.attr("r", function(d){return d.r;})
 
 
 		if (b_list.length>0){
@@ -376,7 +370,7 @@ function draw(data) {
             div.transition()		
                 .duration(200)		
                 .style("opacity", 0.9);
-            div	.html(d.name + "<br/>cluster:"  + d.cluster + "<br/>freq:"  + d.r)	
+            div	.html(d.name + "<br/>cluster:"  + d.cluster + "<br/>freq:"  + d.relfreqs[win])	
                 .style("left", (d3.event.pageX) + "px")		
                 .style("top", (d3.event.pageY - 28) + "px");
             })					
