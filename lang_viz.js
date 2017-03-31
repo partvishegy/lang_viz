@@ -407,10 +407,11 @@ function draw(data) {
 		}
 
 		update_info_divs();
-		update_perm_tooltip();
+		add_perm_tooltip();
 	}
 
-	function update_perm_tooltip(){
+	function add_perm_tooltip(){
+		var rr = 55
 		/*d3.select(".selected_word").attr("fill", "blue")*/
 		container.selectAll(".perm.tooltip")
 		.data(selected_words, function(d){return d.name;})
@@ -418,8 +419,8 @@ function draw(data) {
 		.append("rect")
 			.attr("class", "perm tooltip")
 			.attr("id", function(d){return d.name + "_tt"})
-			.attr("x", function(d){return place_tt(d).x}).attr("rx", 2)
-			.attr("y", function(d){return place_tt(d).y}).attr("ry", 2)
+			.attr("x", function(d){return d.x+place_tt(d).x*rr}).attr("rx", 2)
+			.attr("y", function(d){return d.y+place_tt(d).y*rr}).attr("ry", 2)
 			.attr("width", 25)
 			.attr("height", 10)
 			.style("fill", "lightsteelblue")
@@ -431,25 +432,27 @@ function draw(data) {
 		.append("line")
 			.attr("class", "vonal")
 			.attr("id", function(d){return d.name + "_vonal"})
-			.attr("x1", function(d){return place_tt(d).pp.x})
-			.attr("y1", function(d){return place_tt(d).pp.y})
-			.attr("x1", function(d){return place_tt(d).oo.x})
-			.attr("y1", function(d){return place_tt(d).oo.y})
-			.style("stroke","rgb(255,0,0)")
-			.style("stroke-width", 5);
+			.attr("x1", function(d){return d.x+place_tt(d).x*d.r})
+			.attr("y1", function(d){return d.y+place_tt(d).y*d.r})
+			.attr("x2", function(d){return d.x+place_tt(d).x*rr})
+			.attr("y2", function(d){return d.y+place_tt(d).y*rr})
+			.style("stroke","steelblue")
+			.style("stroke-width", "1px");
 
 	}
 
 	// calculate place of permanent tooltip relative to the word based on word-cluster relation
 	function place_tt(wd){
-		var o,p,l1,l2,h,theta,out;
+		var o,p,l1,l2,h,c_theta,s_theta, out;
 		o  = {x: clusters[cc.indexOf(wd.cluster)].x, y: clusters[cc.indexOf(wd.cluster)].y};
 		p  = {x: wd.x, y:wd.y}
 		l1 = p.x-o.x
 		l2 = p.y-o.y
 		h  = Math.sqrt(l1*l1+l2*l2)	// hypotenuse
-		theta = Math.acos(l1/h);
-		out = {x:Math.cos(theta)*100, y:Math.sin(theta)*100, pp:p, oo:o}
+		c_theta = Math.acos(l1/h);
+		s_theta = Math.asin(l2/h);
+		out = {x:Math.cos(c_theta), y:Math.sin(s_theta), pp:p, oo:o}
+		console.log(out)
 
 		// kvadráns szerint még igazíthatunk, hogy a legközelebbi sarokhoz kapcsolódjon majd a vonal!
 
@@ -513,7 +516,6 @@ function draw(data) {
 			.attr("fill", "hsla(0, 0%, 0%, 0)")
 			.attr("stroke", "hsla(120, 100%, 20%, 0.7)")
 			.attr("stroke-width", 5);
-
 
 		pulses.transition().duration(1000).ease("linear")
 			.attr("r", 1000)
