@@ -412,6 +412,19 @@ function draw(data) {
 
 	function add_perm_tooltip(){
 		/*d3.select(".selected_word").attr("fill", "blue")*/
+		container.selectAll(".vonal")
+		.data(selected_words, function(d){return d.name;})
+		.enter()
+		.append("line")
+			.attr("class", "vonal")
+			.attr("id", function(d){return d.name + "_vonal"})
+			.attr("x1", function(d){return d.x+tt_angle(d).x*d.r})
+			.attr("y1", function(d){return d.y+tt_angle(d).y*d.r})
+			.attr("x2", function(d){return d.x+tt_angle(d).x*rr})
+			.attr("y2", function(d){return d.y+tt_angle(d).y*rr})
+			.style("stroke","steelblue")
+			.style("stroke-width", "1px");
+			
 		container.selectAll(".perm.tooltip")
 		.data(selected_words, function(d){return d.name;})
 		.enter()
@@ -437,18 +450,26 @@ function draw(data) {
     		.style("font-size", "5px")
 			.text(function(d){return d.name;});
 
+
+		// exit selections - remove tooltips for unselected words
 		container.selectAll(".vonal")
 		.data(selected_words, function(d){return d.name;})
-		.enter()
-		.append("line")
-			.attr("class", "vonal")
-			.attr("id", function(d){return d.name + "_vonal"})
-			.attr("x1", function(d){return d.x+tt_angle(d).x*d.r})
-			.attr("y1", function(d){return d.y+tt_angle(d).y*d.r})
-			.attr("x2", function(d){return d.x+tt_angle(d).x*rr})
-			.attr("y2", function(d){return d.y+tt_angle(d).y*rr})
-			.style("stroke","steelblue")
-			.style("stroke-width", "1px");
+		.exit()
+			.transition().duration(500).style("opacity", 0)
+			.remove();
+		container.selectAll(".perm.tooltip")
+		.data(selected_words, function(d){return d.name;})
+		.exit()
+			.transition().duration(500).style("opacity", 0)
+			.remove();
+		container.selectAll(".tt_text")
+		.data(selected_words, function(d){return d.name;})
+		.exit()
+			.transition().duration(500).style("opacity", 0)
+			.remove();
+
+	
+
 	}
 
 	function tt_tick(){
