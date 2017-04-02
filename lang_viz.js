@@ -343,8 +343,8 @@ function draw(data) {
 
 		newborns.transition().duration(2000)
 		  	.attr("r", function(d){return d.r;});
-		// the transition still gives a seemingly irrelevant typeError. this may cause problems.
-		// if so, we can get rid of the transition, and just let the newborns pop up.
+
+		add_perm_tooltip();		
 	}
 
 
@@ -361,8 +361,11 @@ function draw(data) {
 			.transition()
 			.duration(2000)
 			.attr("r", 0)
-			.remove();
+			.remove();	
+
+		add_perm_tooltip();
 	}
+
 
 	// add tooltip to words
 	function tooltip(){
@@ -411,9 +414,13 @@ function draw(data) {
 	}
 
 	function add_perm_tooltip(){
+		var selected_alive = selected_words.filter(function(el){
+		  return words_dead.indexOf(el) < 0;
+		})
+		console.log(selected_alive)
 		/*d3.select(".selected_word").attr("fill", "blue")*/
 		container.selectAll(".vonal")
-		.data(selected_words, function(d){return d.name;})
+		.data(selected_alive/*, function(d){return d.name;}*/)
 		.enter()
 		.append("line")
 			.attr("class", "vonal")
@@ -424,9 +431,9 @@ function draw(data) {
 			.attr("y2", function(d){return d.y+tt_angle(d).y*rr})
 			.style("stroke","steelblue")
 			.style("stroke-width", "1px");
-			
+
 		container.selectAll(".perm.tooltip")
-		.data(selected_words, function(d){return d.name;})
+		.data(selected_alive/*, function(d){return d.name;}*/)
 		.enter()
 		.append("rect")
 			.attr("class", "perm tooltip")
@@ -439,53 +446,53 @@ function draw(data) {
 			.style("opacity", 0.9)
 
 		container.selectAll(".tt_text")
-		.data(selected_words, function(d){return d.name;})
+		.data(selected_alive/*, function(d){return d.name;}*/)
 		.enter()
 		.append("text")
 		.attr("class", "tt_text")
 		.attr("id", function(d){return d.name + "_text"})
 			.attr("x", function(d){return d.x+tt_angle(d).x*rr})
 			.attr("y", function(d){return d.y+tt_angle(d).y*rr})
-    		//.attr("stroke", "#00ff00")
-    		.style("font-size", "5px")
-			.text(function(d){return d.name;});
+			.text(function(d){return d.name;})
+    		.style("font-size", "5px");
 
 
 		// exit selections - remove tooltips for unselected words
 		container.selectAll(".vonal")
-		.data(selected_words, function(d){return d.name;})
+		.data(selected_alive/*, function(d){return d.name;}*/)
 		.exit()
 			.transition().duration(500).style("opacity", 0)
 			.remove();
 		container.selectAll(".perm.tooltip")
-		.data(selected_words, function(d){return d.name;})
+		.data(selected_alive/*, function(d){return d.name;}*/)
 		.exit()
 			.transition().duration(500).style("opacity", 0)
 			.remove();
 		container.selectAll(".tt_text")
-		.data(selected_words, function(d){return d.name;})
+		.data(selected_alive/*, function(d){return d.name;}*/)
 		.exit()
 			.transition().duration(500).style("opacity", 0)
 			.remove();
-
-	
-
 	}
 
+
 	function tt_tick(){
+		var selected_alive = selected_words.filter(function(el){
+		  return words_alive.indexOf(el) > -1;})
 
 		d3.selectAll(".perm.tooltip")
-		.data(selected_words)
+		.data(selected_alive)
 				.attr("x", function(d){return d.x+tt_angle(d).x*rr})
 				.attr("y", function(d){return d.y+tt_angle(d).y*rr})
 
 		d3.selectAll(".tt_text")
-		.data(selected_words)
+		.data(selected_alive)
 				.attr("x", function(d){return d.x+tt_angle(d).x*rr})
 				.attr("y", function(d){return d.y+tt_angle(d).y*rr})
+				.text(function(d){return d.name;})
 
 		d3.selectAll(".vonal")
-		.data(selected_words)
+		.data(selected_alive)
 			.attr("x1", function(d){return d.x+tt_angle(d).x*d.r})
 			.attr("y1", function(d){return d.y+tt_angle(d).y*d.r})
 			.attr("x2", function(d){return d.x+tt_angle(d).x*rr})
