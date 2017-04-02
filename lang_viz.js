@@ -430,7 +430,8 @@ function draw(data) {
 			.attr("x2", function(d){return d.x+tt_angle(d).x*rr})
 			.attr("y2", function(d){return d.y+tt_angle(d).y*rr})
 			.style("stroke","steelblue")
-			.style("stroke-width", "1px");
+			.style("stroke-width", "1px")
+			.style("opacity", 0.5);
 
 		container.selectAll(".perm.tooltip")
 		.data(selected_alive/*, function(d){return d.name;}*/)
@@ -440,7 +441,15 @@ function draw(data) {
 			.attr("id", function(d){return d.name + "_tt"})
 			.attr("x", function(d){return d.x+tt_angle(d).x*rr}).attr("rx", 2)
 			.attr("y", function(d){return d.y+tt_angle(d).y*rr}).attr("ry", 2)
-			.attr("width", 25)
+			/*.attr("width", 25)*/
+			.style("width",
+                	function(d){
+                		if(d.name.length<10){
+	                		width = "30px"
+	                	}else{
+	                		width = 15+(d.name.length-6)*2 + "px"
+	                	}
+	                return width})
 			.attr("height", 10)
 			.style("fill", "lightsteelblue")
 			.style("opacity", 0.9)
@@ -451,10 +460,16 @@ function draw(data) {
 		.append("text")
 		.attr("class", "tt_text")
 		.attr("id", function(d){return d.name + "_text"})
-			.attr("x", function(d){return d.x+tt_angle(d).x*rr})
-			.attr("y", function(d){return d.y+tt_angle(d).y*rr})
+			.attr("x", function(d){return (d.x+tt_angle(d).x*rr)})
+			.attr("y", function(d){return (d.y+tt_angle(d).y*rr)})
 			.text(function(d){return d.name;})
-    		.style("font-size", "5px");
+    		.style("font-size", "4px");
+
+    		// a több infő mehet 3px-szel.
+
+
+    	// d3.selectAll(".tt_text")[0][1].getComputedTextLength()
+
 
 
 		// exit selections - remove tooltips for unselected words
@@ -487,8 +502,11 @@ function draw(data) {
 
 		d3.selectAll(".tt_text")
 		.data(selected_alive)
-				.attr("x", function(d){return d.x+tt_angle(d).x*rr})
-				.attr("y", function(d){return d.y+tt_angle(d).y*rr})
+				.attr("x", function(d){return (d.x+tt_angle(d).x*rr)
+					+(d3.select("#" + d.name + "_tt")[0][0].getBBox().width/2)
+					-(d3.select("#" + d.name + "_text")[0][0].getComputedTextLength()/2)
+				})
+				.attr("y", function(d){return (d.y+tt_angle(d).y*rr)+5})
 				.text(function(d){return d.name;})
 
 		d3.selectAll(".vonal")
@@ -519,7 +537,7 @@ function draw(data) {
 
 
 	function update_info_divs(){
-		d3.selectAll("div.selected_w_div")
+/*		d3.selectAll("div.selected_w_div")
 			.data(selected_words)
 			.style("background", function(d){if (d.cluster==-1){
 												return "lightgrey";
@@ -535,7 +553,7 @@ function draw(data) {
 						+ "<br/>ahead: "  + ahead.join(", ");
 			})
 			.on("click", pulse_me
-				);
+				);*/
 	}
 
 	function pulse_me(e){
