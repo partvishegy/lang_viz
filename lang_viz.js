@@ -1,4 +1,4 @@
-var win, cc, padding = 3, maxRadius = 3, 
+var win, cc, padding = 3, maxRadius = 3, rr = 40,
 	start_date = new Date(2007,0,1)
 
 
@@ -411,7 +411,6 @@ function draw(data) {
 	}
 
 	function add_perm_tooltip(){
-		var rr = 55
 		/*d3.select(".selected_word").attr("fill", "blue")*/
 		container.selectAll(".perm.tooltip")
 		.data(selected_words, function(d){return d.name;})
@@ -419,12 +418,24 @@ function draw(data) {
 		.append("rect")
 			.attr("class", "perm tooltip")
 			.attr("id", function(d){return d.name + "_tt"})
-			.attr("x", function(d){return d.x+place_tt(d).x*rr}).attr("rx", 2)
-			.attr("y", function(d){return d.y+place_tt(d).y*rr}).attr("ry", 2)
+			.attr("x", function(d){return d.x+tt_angle(d).x*rr}).attr("rx", 2)
+			.attr("y", function(d){return d.y+tt_angle(d).y*rr}).attr("ry", 2)
 			.attr("width", 25)
 			.attr("height", 10)
 			.style("fill", "lightsteelblue")
-			.style("opacity", 0.9);
+			.style("opacity", 0.9)
+
+		container.selectAll(".tt_text")
+		.data(selected_words, function(d){return d.name;})
+		.enter()
+		.append("text")
+		.attr("class", "tt_text")
+		.attr("id", function(d){return d.name + "_text"})
+			.attr("x", function(d){return d.x+tt_angle(d).x*rr})
+			.attr("y", function(d){return d.y+tt_angle(d).y*rr})
+    		//.attr("stroke", "#00ff00")
+    		.style("font-size", "5px")
+			.text(function(d){return d.name;});
 
 		container.selectAll(".vonal")
 		.data(selected_words, function(d){return d.name;})
@@ -432,17 +443,37 @@ function draw(data) {
 		.append("line")
 			.attr("class", "vonal")
 			.attr("id", function(d){return d.name + "_vonal"})
-			.attr("x1", function(d){return d.x+place_tt(d).x*d.r})
-			.attr("y1", function(d){return d.y+place_tt(d).y*d.r})
-			.attr("x2", function(d){return d.x+place_tt(d).x*rr})
-			.attr("y2", function(d){return d.y+place_tt(d).y*rr})
+			.attr("x1", function(d){return d.x+tt_angle(d).x*d.r})
+			.attr("y1", function(d){return d.y+tt_angle(d).y*d.r})
+			.attr("x2", function(d){return d.x+tt_angle(d).x*rr})
+			.attr("y2", function(d){return d.y+tt_angle(d).y*rr})
 			.style("stroke","steelblue")
 			.style("stroke-width", "1px");
+	}
+
+	function tt_tick(){
+
+		d3.selectAll(".perm.tooltip")
+		.data(selected_words)
+				.attr("x", function(d){return d.x+tt_angle(d).x*rr})
+				.attr("y", function(d){return d.y+tt_angle(d).y*rr})
+
+		d3.selectAll(".tt_text")
+		.data(selected_words)
+				.attr("x", function(d){return d.x+tt_angle(d).x*rr})
+				.attr("y", function(d){return d.y+tt_angle(d).y*rr})
+
+		d3.selectAll(".vonal")
+		.data(selected_words)
+			.attr("x1", function(d){return d.x+tt_angle(d).x*d.r})
+			.attr("y1", function(d){return d.y+tt_angle(d).y*d.r})
+			.attr("x2", function(d){return d.x+tt_angle(d).x*rr})
+			.attr("y2", function(d){return d.y+tt_angle(d).y*rr})
 
 	}
 
 	// calculate place of permanent tooltip relative to the word based on word-cluster relation
-	function place_tt(wd){
+	function tt_angle(wd){
 		var o,p,l1,l2,h,c_theta,s_theta, out;
 		o  = {x: clusters[cc.indexOf(wd.cluster)].x, y: clusters[cc.indexOf(wd.cluster)].y};
 		p  = {x: wd.x, y:wd.y}
@@ -452,19 +483,11 @@ function draw(data) {
 		c_theta = Math.acos(l1/h);
 		s_theta = Math.asin(l2/h);
 		out = {x:Math.cos(c_theta), y:Math.sin(s_theta), pp:p, oo:o}
-		console.log(out)
+		/*console.log(out)*/
 
 		// kvadráns szerint még igazíthatunk, hogy a legközelebbi sarokhoz kapcsolódjon majd a vonal!
-
-
-		// azért nem működik, mert a word objectnek statikusak a coordinátái.
-		// a circle dom-object alapján kell frissíteni. ehhez majd kell egy okos select a place_tt-be!
-
 		return out
-
 	}
-
-
 
 
 	function update_info_divs(){
@@ -539,6 +562,8 @@ function draw(data) {
 			  .each(collide(0.5))
 			.attr("cx", function(d){return d.x;}) //console.log(d.name);
 			.attr("cy", function(d){return d.y;});
+
+		tt_tick()
 	}
 
 
