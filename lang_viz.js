@@ -409,7 +409,7 @@ function draw(data) {
 			selected_words.splice(i,1);
 		}
 
-		update_info_divs();
+		//update_info_divs();
 		add_perm_tooltip();
 	}
 
@@ -445,11 +445,12 @@ function draw(data) {
 			.style("width",
                 	function(d){
                 		if(d.name.length<10){
-	                		width = "30px"
+	                		width = 30
 	                	}else{
-	                		width = 15+(d.name.length-6)*2 + "px"
+	                		width = (d.name.length)*3
 	                	}
-	                return width})
+	                d.width = width
+	                return width + "px"})
 			.attr("height", 10)
 			.style("fill", "lightsteelblue")
 			.style("opacity", 0.9)
@@ -464,13 +465,6 @@ function draw(data) {
 			.attr("y", function(d){return (d.y+tt_angle(d).y*rr)})
 			.text(function(d){return d.name;})
     		.style("font-size", "4px");
-
-    		// a több infő mehet 3px-szel.
-
-
-    	// d3.selectAll(".tt_text")[0][1].getComputedTextLength()
-
-
 
 		// exit selections - remove tooltips for unselected words
 		container.selectAll(".vonal")
@@ -502,10 +496,7 @@ function draw(data) {
 
 		d3.selectAll(".tt_text")
 		.data(selected_alive)
-				.attr("x", function(d){return (d.x+tt_angle(d).x*rr)
-					+(d3.select("#" + d.name + "_tt")[0][0].getBBox().width/2)
-					-(d3.select("#" + d.name + "_text")[0][0].getComputedTextLength()/2)
-				})
+				.attr("x", function(d){return (d.x+tt_angle(d).x*rr)+d.width/2 - d.name.length +1}) // minusz text-len/2.
 				.attr("y", function(d){return (d.y+tt_angle(d).y*rr)+5})
 				.text(function(d){return d.name;})
 
@@ -529,9 +520,7 @@ function draw(data) {
 		c_theta = Math.acos(l1/h);
 		s_theta = Math.asin(l2/h);
 		out = {x:Math.cos(c_theta), y:Math.sin(s_theta), pp:p, oo:o}
-		/*console.log(out)*/
-
-		// kvadráns szerint még igazíthatunk, hogy a legközelebbi sarokhoz kapcsolódjon majd a vonal!
+		
 		return out
 	}
 
@@ -604,7 +593,7 @@ function draw(data) {
 			o.x += (clusters[cc.indexOf(o.cluster)].x - o.x) * k;
 		});
 
-		container.selectAll("circle.word") //words_dots selection
+		container.selectAll("circle.word")
 			  .each(collide(0.5))
 			.attr("cx", function(d){return d.x;}) //console.log(d.name);
 			.attr("cy", function(d){return d.y;});
@@ -658,13 +647,6 @@ function draw(data) {
 	function dragended(d){
 		d3.select(this).classed("dragging", false);
 	}
-
-
-
-/*	var dat = new Date();
-
-	alert(dat.addDays(5))*/
-	//----------------------------------------
 
 } // end of draw
 
