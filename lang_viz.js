@@ -43,12 +43,12 @@ var selected_words = [];
 	words_dead  = [];
 	word_count = words_alive.legth;// update in birth() and death().
 	
-
 	/*{{ selected_words }}*/
 	/* {{pi vagy sigma}} */
 	/* {{start date}} */
 	/* {{end date}} */
 	/* {{window size for the date intervals}} */
+	preselected = ["gyurcsány_N", "hisz_V"]
 
 
 function draw(data) {
@@ -72,7 +72,7 @@ function draw(data) {
 		// get rid of this later --> uniform cluster color
 		var h = Math.ceil(Math.random() * 360);
 		d.color = "hsla("+h.toString()+", 100%, 20%, 0.5)";
-	});	
+	});
 
 	// sort words to alive and dead lists
 	words.forEach(function(w){
@@ -83,6 +83,12 @@ function draw(data) {
 			/*console.log(w);*/
 		}
 	});
+
+/*	words.map(function(d){
+		if (preselected.indexOf(d.name) > -1){
+			select_word(d)
+		}
+	});*/
 
 
 	var dimensions = {width: $(window).width()-22, height:$(window).height()-220};
@@ -219,6 +225,14 @@ function draw(data) {
 			.call(drag)
 			.on("dblclick", select_word);
     tooltip();
+    words_alive.forEach(function(o,i){
+			if (preselected.indexOf(o.name) > -1){
+				//selected_words.push(o)
+				select_word(o)
+			}
+		});
+    add_perm_tooltip();
+
 
     //add timescale
     var margin = {top: 28, right: 100, bottom: 10, left: 10}, //top=30!!
@@ -320,6 +334,11 @@ function draw(data) {
 			var id = words_dead.indexOf(o);
 			words_dead.splice(id,1);
 			words_alive.push(o);
+
+			if (preselected.indexOf(o.name) > -1){
+				selected_words.push(o)
+			}
+
 		});
 
 		force.nodes(words_alive).start();	
@@ -404,9 +423,11 @@ function draw(data) {
 			sel.classed("selected_word", true);
 			selected_words.push(e);
 		}else{
-			sel.classed("selected_word", false);
-			var i = selected_words.indexOf(e);
-			selected_words.splice(i,1);
+			if(preselected.indexOf(e.name) < 0){
+				sel.classed("selected_word", false);
+				var i = selected_words.indexOf(e);
+				selected_words.splice(i,1);
+			}
 		}
 
 		//update_info_divs();
@@ -520,7 +541,7 @@ function draw(data) {
 		c_theta = Math.acos(l1/h);
 		s_theta = Math.asin(l2/h);
 		out = {x:Math.cos(c_theta), y:Math.sin(s_theta), pp:p, oo:o}
-		
+
 		return out
 	}
 
