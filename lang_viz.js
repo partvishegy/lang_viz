@@ -474,6 +474,12 @@ function draw(data) {
 	                return width + "px"})
 			.attr("height", 10)
 			.style("fill", "lightsteelblue")
+			.style("stroke", function(d){if(preselected.indexOf(d.name) < 0){
+				return "none"
+			}else{
+				return "steelblue"
+			}})
+			.style("stroke-width", "1px")
 			.style("opacity", 0.9)
 
 		container.selectAll(".tt_text")
