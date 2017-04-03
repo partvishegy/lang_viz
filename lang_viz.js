@@ -98,7 +98,7 @@ function draw(data) {
 	d3.select("#time").attr("max",last_win);	
 
 	//svg behaviour
-	var zoom = d3.behavior.zoom()
+	var zoom = d3.behavior.zoom()//.on("dblclick.zoom", null)
 	    .scaleExtent([0.3, 10])
 	    .on("zoom", zoomed);
 	var drag = d3.behavior.drag()
@@ -113,7 +113,7 @@ function draw(data) {
 			.attr("width", $('#chart_disp').width()-5)
 			.attr("height", $('#chart_disp').height()-5)
 		.append("g")
-    		.call(zoom);
+    		.call(zoom).on("dblclick.zoom", null);
 
     //improve clickability0
     var rect = chart_disp.append("rect")
@@ -531,8 +531,8 @@ function draw(data) {
 		.data(selected_alive)
 			.attr("x1", function(d){return d.x+tt_angle(d).x*d.r})
 			.attr("y1", function(d){return d.y+tt_angle(d).y*d.r})
-			.attr("x2", function(d){return d.x+tt_angle(d).x*rr})
-			.attr("y2", function(d){return d.y+tt_angle(d).y*rr})
+			.attr("x2", function(d){return d.x+tt_angle(d).x*rr+1})
+			.attr("y2", function(d){return d.y+tt_angle(d).y*rr+1})
 
 	}
 
