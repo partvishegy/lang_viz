@@ -481,6 +481,7 @@ function draw(data) {
 			}})
 			.style("stroke-width", "1px")
 			.style("opacity", 0.9)
+		.on("dblclick", extend_tooltip)
 
 		container.selectAll(".tt_text")
 		.data(selected_alive/*, function(d){return d.name;}*/)
@@ -534,6 +535,29 @@ function draw(data) {
 			.attr("x2", function(d){return d.x+tt_angle(d).x*rr+1})
 			.attr("y2", function(d){return d.y+tt_angle(d).y*rr+1})
 
+	}
+
+	function extend_tooltip(e){
+		var ext_tt = d3.select("#" + e.name + "_tt")
+		console.log(ext_tt)
+
+		if (!ext_tt.classed("extended")){
+			ext_tt.classed("extended", true);
+			//selected_words.push(e);
+		}else{
+			ext_tt.classed("extended", false);
+			/*var i = selected_words.indexOf(e);
+			selected_words.splice(i,1);*/
+		}
+
+		ext_tt.transition().duration(700).attr("height",function(){
+			if (ext_tt.classed("extended")){
+				return 25
+			} else {
+				return 10
+			}
+		})
+		
 	}
 
 	// calculate place of permanent tooltip relative to the word based on word-cluster relation
