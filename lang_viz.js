@@ -520,6 +520,20 @@ function draw(data) {
 		.data(selected_alive)
 				.attr("x", function(d){return d.x+tt_angle(d).x*rr})
 				.attr("y", function(d){return d.y+tt_angle(d).y*rr})
+				.style("width",
+                	function(d){
+                		if(d.name.length<10){
+	                		width = 30
+	                	}else{
+	                		width = (d.name.length)*3
+	                	}
+	                d.width = width
+	                return width + "px"})
+				.style("stroke", function(d){if(preselected.indexOf(d.name) < 0){
+				return "none"
+			}else{
+				return "steelblue"
+			}})
 
 		d3.selectAll(".tt_text")
 		.data(selected_alive)
